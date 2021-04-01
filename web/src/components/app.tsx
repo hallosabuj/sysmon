@@ -9,6 +9,7 @@ import {
 import { DashboardPage }     from "./pages/dashboard-page";
 import { RoutesPage }        from "./pages/routes-page";
 import { MetricsPage }       from "./pages/metrics-page";
+import { SamplePage } from "./pages/sample-page";
 
 interface AppState {
     sidebarOpen: boolean;
@@ -60,6 +61,9 @@ export class App extends React.Component<AppProps, AppState> {
                     <NavItem>
                         <NavLink exact to='/web/metrics' activeClassName="pf-m-current">Metrics</NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink exact to='/web/sample' activeClassName="pf-m-current">Sample</NavLink>
+                    </NavItem>
                 </NavList>
             </Nav>
         );
@@ -78,6 +82,9 @@ export class App extends React.Component<AppProps, AppState> {
                         </Route>
                         <Route exact path='/web/metrics'>
                             <MetricsPage> </MetricsPage>
+                        </Route>
+                        <Route exact path='/web/sample'>
+                            <SamplePage> </SamplePage>
                         </Route>
                         <Route exact path='/'>
                             <Redirect to='/web/dashboard'> </Redirect>

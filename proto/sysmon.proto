@@ -8,8 +8,61 @@ message PingRequest {
 
 }
 
+message PP{
+  repeated string name =1;
+}
 message PingResponse {
-  string body                                          = 1;
+  PP body =1;
+}
+
+message PongRequest {
+  Person body                                          = 1;
+}
+message Person{
+  string name                                          = 1;
+  int64 age                                            = 2;
+}
+message PongResponse {
+  Person body                                          = 1;
+}
+
+message Rule{
+  string priority =1;
+  string rule     =2;
+}
+message Rules{
+  repeated Rule rules =1;
+}
+message RuleRespone{
+  Rules response   =1;
+}
+
+message Route{
+  string index     =1;
+  string route     =2;
+}
+message Routes{
+  repeated Route routes =1;
+}
+message RouteRespone{
+  Routes response   =1;
+}
+
+message Response{
+  string msg              =1;
+}
+message Request{
+  string source_ip        =1;
+  string table_name       =2;
+  string destination      =3;
+  string intermediate     =4;
+  string net_interface    =5;
+}
+message IPRequest{
+  Request request        =1; 
+}
+message IPResponse{
+  Response response       =1;
 }
 
 service SysmonService {
@@ -17,6 +70,57 @@ service SysmonService {
     option (google.api.http) = {
       get: "/api/v1/ping"
       response_body: "body"
+    };
+  }
+  rpc Pong(PongRequest) returns (PongResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/pong"
+      body: "body"
+      response_body: "body"
+    };
+  }
+  rpc AddRule(IPRequest) returns (IPResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/addrule"
+      body: "request"
+      response_body: "response"
+    };
+  }
+
+  rpc DelRule(IPRequest) returns (IPResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/delrule"
+      body: "request"
+      response_body: "response"
+    };
+  }
+
+  rpc AddRoute(IPRequest) returns (IPResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/addroute"
+      body: "request"
+      response_body: "response"
+    };
+  }
+
+  rpc DelRoute(IPRequest) returns (IPResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/delroute"
+      body: "request"
+      response_body: "response"
+    };
+  }
+
+  rpc ListRule(IPRequest) returns (RuleRespone) {
+    option (google.api.http) = {
+      get: "/api/v1/listrule"
+      response_body: "response"
+    };
+  }
+  rpc ListRoute(IPRequest) returns (RouteRespone) {
+    option (google.api.http) = {
+      get: "/api/v1/listroute"
+      response_body: "response"
     };
   }
 }

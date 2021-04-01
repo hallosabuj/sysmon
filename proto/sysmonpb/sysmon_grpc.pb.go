@@ -19,6 +19,13 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SysmonServiceClient interface {
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
+	Pong(ctx context.Context, in *PongRequest, opts ...grpc.CallOption) (*PongResponse, error)
+	AddRule(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error)
+	DelRule(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error)
+	AddRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error)
+	DelRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error)
+	ListRule(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*RuleRespone, error)
+	ListRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*RouteRespone, error)
 }
 
 type sysmonServiceClient struct {
@@ -38,11 +45,81 @@ func (c *sysmonServiceClient) Ping(ctx context.Context, in *PingRequest, opts ..
 	return out, nil
 }
 
+func (c *sysmonServiceClient) Pong(ctx context.Context, in *PongRequest, opts ...grpc.CallOption) (*PongResponse, error) {
+	out := new(PongResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/Pong", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sysmonServiceClient) AddRule(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error) {
+	out := new(IPResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/AddRule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sysmonServiceClient) DelRule(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error) {
+	out := new(IPResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/DelRule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sysmonServiceClient) AddRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error) {
+	out := new(IPResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/AddRoute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sysmonServiceClient) DelRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error) {
+	out := new(IPResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/DelRoute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sysmonServiceClient) ListRule(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*RuleRespone, error) {
+	out := new(RuleRespone)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/ListRule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sysmonServiceClient) ListRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*RouteRespone, error) {
+	out := new(RouteRespone)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/ListRoute", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SysmonServiceServer is the server API for SysmonService service.
 // All implementations must embed UnimplementedSysmonServiceServer
 // for forward compatibility
 type SysmonServiceServer interface {
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
+	Pong(context.Context, *PongRequest) (*PongResponse, error)
+	AddRule(context.Context, *IPRequest) (*IPResponse, error)
+	DelRule(context.Context, *IPRequest) (*IPResponse, error)
+	AddRoute(context.Context, *IPRequest) (*IPResponse, error)
+	DelRoute(context.Context, *IPRequest) (*IPResponse, error)
+	ListRule(context.Context, *IPRequest) (*RuleRespone, error)
+	ListRoute(context.Context, *IPRequest) (*RouteRespone, error)
 	mustEmbedUnimplementedSysmonServiceServer()
 }
 
@@ -52,6 +129,27 @@ type UnimplementedSysmonServiceServer struct {
 
 func (UnimplementedSysmonServiceServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedSysmonServiceServer) Pong(context.Context, *PongRequest) (*PongResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Pong not implemented")
+}
+func (UnimplementedSysmonServiceServer) AddRule(context.Context, *IPRequest) (*IPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRule not implemented")
+}
+func (UnimplementedSysmonServiceServer) DelRule(context.Context, *IPRequest) (*IPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelRule not implemented")
+}
+func (UnimplementedSysmonServiceServer) AddRoute(context.Context, *IPRequest) (*IPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRoute not implemented")
+}
+func (UnimplementedSysmonServiceServer) DelRoute(context.Context, *IPRequest) (*IPResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelRoute not implemented")
+}
+func (UnimplementedSysmonServiceServer) ListRule(context.Context, *IPRequest) (*RuleRespone, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRule not implemented")
+}
+func (UnimplementedSysmonServiceServer) ListRoute(context.Context, *IPRequest) (*RouteRespone, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoute not implemented")
 }
 func (UnimplementedSysmonServiceServer) mustEmbedUnimplementedSysmonServiceServer() {}
 
@@ -84,6 +182,132 @@ func _SysmonService_Ping_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SysmonService_Pong_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PongRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).Pong(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/Pong",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).Pong(ctx, req.(*PongRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SysmonService_AddRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).AddRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/AddRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).AddRule(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SysmonService_DelRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).DelRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/DelRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).DelRule(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SysmonService_AddRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).AddRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/AddRoute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).AddRoute(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SysmonService_DelRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).DelRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/DelRoute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).DelRoute(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SysmonService_ListRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).ListRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/ListRule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).ListRule(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SysmonService_ListRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).ListRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/ListRoute",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).ListRoute(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SysmonService_ServiceDesc is the grpc.ServiceDesc for SysmonService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +318,34 @@ var SysmonService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _SysmonService_Ping_Handler,
+		},
+		{
+			MethodName: "Pong",
+			Handler:    _SysmonService_Pong_Handler,
+		},
+		{
+			MethodName: "AddRule",
+			Handler:    _SysmonService_AddRule_Handler,
+		},
+		{
+			MethodName: "DelRule",
+			Handler:    _SysmonService_DelRule_Handler,
+		},
+		{
+			MethodName: "AddRoute",
+			Handler:    _SysmonService_AddRoute_Handler,
+		},
+		{
+			MethodName: "DelRoute",
+			Handler:    _SysmonService_DelRoute_Handler,
+		},
+		{
+			MethodName: "ListRule",
+			Handler:    _SysmonService_ListRule_Handler,
+		},
+		{
+			MethodName: "ListRoute",
+			Handler:    _SysmonService_ListRoute_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -41,7 +41,8 @@ func Unzip(source, destination, pattern string) error {
 		if file.FileInfo().IsDir() {
 			continue
 		}
-		if matched, err := filepath.Match(pattern, file.Name); nil == err {
+		_, name := filepath.Split(file.Name)
+		if matched, err := filepath.Match(pattern, name); nil == err {
 			if !matched {
 				continue
 			}
