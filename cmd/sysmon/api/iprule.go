@@ -7,10 +7,6 @@ import (
 	"sysmon/proto/sysmonpb"
 )
 
-type Rule struct {
-	Source_ip  string `json:"source_ip"`
-	Table_name string `json:"table_name"`
-}
 type Rules struct {
 	Priority string `json:"priority"`
 	Rule     string `json:"rule"`
@@ -28,7 +24,6 @@ func AddIPRule(request *sysmonpb.IPRequest) string {
 	//Else			: Return
 
 	rules, _ := exec.Command("ip", "rule", "list").Output()
-
 	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
 		if strings.Contains(line, source_ip) && strings.Contains(line, table_name) {
 			response = "Rule exist.."
@@ -36,7 +31,6 @@ func AddIPRule(request *sysmonpb.IPRequest) string {
 			break
 		}
 	}
-
 	if !flag {
 
 		cmd := exec.Command("sudo", "ip", "rule", "add", "from", source_ip, "lookup", table_name)
@@ -63,40 +57,32 @@ func DelIPRule(request *sysmonpb.IPRequest) string {
 	//Else		: Return
 
 	rules, _ := exec.Command("ip", "rule", "list").Output()
-
 	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
 		if strings.Contains(line, source_ip) {
 			flag = true
 			break
 		}
 	}
-
 	if flag {
-
 		cmd := exec.Command("sudo", "ip", "rule", "del", "from", source_ip)
 		err := cmd.Run()
-
 		if err != nil {
 			fmt.Println(err)
 			response = "Error"
 		} else {
 			response = "Rule deleted"
 		}
-
 	} else {
 		response = "Rule not exist.."
 	}
-
 	return response
 }
 
-func ListIPRules() []Rules {
+func IPRules() []Rules {
 	rules, _ := exec.Command("ip", "rule", "list").Output()
 	var result []Rules
 	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
 		result = append(result, Rules{Priority: strings.Split(line, ":\t")[0], Rule: strings.Split(line, ":\t")[1]})
 	}
-	// json_data, _ := json.Marshal(result)
-	//return string(json_data)
 	return result
 }

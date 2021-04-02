@@ -7,7 +7,12 @@ import "google/api/annotations.proto";
 message PingRequest {
 
 }
-
+message DongReq{
+  string id =1;
+}
+message DongRes{
+  string response =1;
+}
 message PP{
   repeated string name =1;
 }
@@ -52,11 +57,11 @@ message Response{
   string msg              =1;
 }
 message Request{
-  string source_ip        =1;
-  string table_name       =2;
+  string sourceIp        =1;
+  string tableName       =2;
   string destination      =3;
   string intermediate     =4;
-  string net_interface    =5;
+  string interfaceName    =5;
 }
 message IPRequest{
   Request request        =1; 
@@ -65,7 +70,50 @@ message IPResponse{
   Response response       =1;
 }
 
+message IpAddress{
+  string IP   =1;
+  string Type =2;
+}
+message IpAddresses{
+  repeated IpAddress addresses  =1;
+}
+message InterfaceAddressesResponse{
+  IpAddresses response   =1;
+}
+
+message Interface{
+  string index   =1;
+  string name =2;
+}
+message Interfaces{
+  repeated Interface interfaces  =1;
+}
+message InterfacesResponse{
+  Interfaces response   =1;
+}
+message Gateway{
+  string destination  =1;
+  string gateway      =2;
+}
+
+message InterfaceDetails{
+  string name =1;
+	repeated Gateway gateways  =2;
+	repeated IpAddress normalAddress =3;
+	repeated IpAddress multicastAddress  =4;
+}
+message InterfaceDetailsResponse{
+  InterfaceDetails response =1;
+}
+
 service SysmonService {
+  rpc Dong(DongReq) returns (DongRes) {
+    option (google.api.http) = {
+      get: "/api/v1/dong/{id}"
+      response_body: "response"
+    };
+  }
+
   rpc Ping(PingRequest) returns (PingResponse) {
     option (google.api.http) = {
       get: "/api/v1/ping"
@@ -111,15 +159,33 @@ service SysmonService {
     };
   }
 
-  rpc ListRule(IPRequest) returns (RuleRespone) {
+  rpc Rules(IPRequest) returns (RuleRespone) {
     option (google.api.http) = {
-      get: "/api/v1/listrule"
+      get: "/api/v1/rules"
       response_body: "response"
     };
   }
-  rpc ListRoute(IPRequest) returns (RouteRespone) {
+  rpc Routes(IPRequest) returns (RouteRespone) {
     option (google.api.http) = {
-      get: "/api/v1/listroute"
+      get: "/api/v1/routes"
+      response_body: "response"
+    };
+  }
+  rpc InterfaceAddresses(IPRequest) returns (InterfaceAddressesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/interfaceaddresses"
+      response_body: "response"
+    };
+  }
+  rpc Interfaces(IPRequest) returns (InterfacesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/interfaces"
+      response_body: "response"
+    };
+  }
+  rpc InterfaceDetailsByName(Request) returns (InterfaceDetailsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/interface/{interfaceName}"
       response_body: "response"
     };
   }

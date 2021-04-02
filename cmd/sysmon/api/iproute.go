@@ -8,19 +8,12 @@ import (
 	"sysmon/proto/sysmonpb"
 )
 
-type Route struct {
-	Destination  string `json:"destination"`
-	Intermediate string `json:"intermediate"`
-	NetInterface string `json:"net_interface"`
-	TableName    string `json:"table_name"`
-}
-
 func AddIPRoute(request *sysmonpb.IPRequest) string {
 	var response string
 	var flag bool
 	destination := request.Request.Destination
 	intermediate := request.Request.Intermediate
-	net_interface := request.Request.NetInterface
+	net_interface := request.Request.InterfaceName
 	table_name := request.Request.TableName
 
 	//sudo ip route add default via 192.168.57.1 dev enp0s3 table custom1
@@ -39,26 +32,21 @@ func AddIPRoute(request *sysmonpb.IPRequest) string {
 	}
 
 	if !flag {
-
 		cmd := exec.Command("sudo", "ip", "route", "add", destination, "via", intermediate, "dev", net_interface, "table", table_name)
 		err := cmd.Run()
-
 		if err != nil {
 			fmt.Println("Error here : ", err)
 			response = "Error"
 		} else {
 			response = "Route added"
 		}
-
 	}
-
 	return response
 }
 
 func DelIPRoute(request *sysmonpb.IPRequest) string {
 	var response string
 	var flag bool
-
 	destination := request.Request.Destination
 	table_name := request.Request.TableName
 
@@ -89,16 +77,14 @@ func DelIPRoute(request *sysmonpb.IPRequest) string {
 	} else {
 		response = "Route does not exist"
 	}
-
 	return response
 }
 
-func ListIPRoutes() map[string]string {
+func IPRoutes() map[string]string {
 	rules, _ := exec.Command("ip", "route", "list").Output()
 	result := make(map[string]string)
 	var i = 1
 	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
-		//result = append(result, line)
 		result[strconv.Itoa(i)] = line
 		i = i + 1
 	}

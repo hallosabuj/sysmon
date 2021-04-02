@@ -31,6 +31,58 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
+func request_SysmonService_Dong_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DongReq
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := client.Dong(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_SysmonService_Dong_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DongReq
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := server.Dong(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_SysmonService_Ping_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq PingRequest
 	var metadata runtime.ServerMetadata
@@ -220,73 +272,215 @@ func local_request_SysmonService_DelRoute_0(ctx context.Context, marshaler runti
 }
 
 var (
-	filter_SysmonService_ListRule_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_SysmonService_Rules_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_SysmonService_ListRule_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_SysmonService_Rules_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq IPRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_ListRule_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_Rules_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListRule(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Rules(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_SysmonService_ListRule_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_SysmonService_Rules_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq IPRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_ListRule_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_Rules_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.ListRule(ctx, &protoReq)
+	msg, err := server.Rules(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
 var (
-	filter_SysmonService_ListRoute_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_SysmonService_Routes_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_SysmonService_ListRoute_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_SysmonService_Routes_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq IPRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_ListRoute_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_Routes_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ListRoute(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Routes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_SysmonService_ListRoute_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_SysmonService_Routes_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq IPRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_ListRoute_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_Routes_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.ListRoute(ctx, &protoReq)
+	msg, err := server.Routes(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_SysmonService_InterfaceAddresses_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_SysmonService_InterfaceAddresses_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq IPRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_InterfaceAddresses_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.InterfaceAddresses(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_SysmonService_InterfaceAddresses_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq IPRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_InterfaceAddresses_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.InterfaceAddresses(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_SysmonService_Interfaces_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_SysmonService_Interfaces_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq IPRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_Interfaces_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.Interfaces(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_SysmonService_Interfaces_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq IPRequest
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_Interfaces_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.Interfaces(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_SysmonService_InterfaceDetailsByName_0 = &utilities.DoubleArray{Encoding: map[string]int{"interfaceName": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
+func request_SysmonService_InterfaceDetailsByName_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Request
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["interfaceName"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "interfaceName")
+	}
+
+	protoReq.InterfaceName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "interfaceName", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_InterfaceDetailsByName_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.InterfaceDetailsByName(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_SysmonService_InterfaceDetailsByName_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Request
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["interfaceName"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "interfaceName")
+	}
+
+	protoReq.InterfaceName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "interfaceName", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_InterfaceDetailsByName_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.InterfaceDetailsByName(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -296,6 +490,29 @@ func local_request_SysmonService_ListRoute_0(ctx context.Context, marshaler runt
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterSysmonServiceHandlerFromEndpoint instead.
 func RegisterSysmonServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server SysmonServiceServer) error {
+
+	mux.Handle("GET", pattern_SysmonService_Dong_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/Dong")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_SysmonService_Dong_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_Dong_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Dong_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
 
 	mux.Handle("GET", pattern_SysmonService_Ping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -435,18 +652,18 @@ func RegisterSysmonServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 
 	})
 
-	mux.Handle("GET", pattern_SysmonService_ListRule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_SysmonService_Rules_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/ListRule")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/Rules")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_SysmonService_ListRule_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_SysmonService_Rules_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -454,22 +671,22 @@ func RegisterSysmonServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 			return
 		}
 
-		forward_SysmonService_ListRule_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_ListRule_0{resp}, mux.GetForwardResponseOptions()...)
+		forward_SysmonService_Rules_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Rules_0{resp}, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_SysmonService_ListRoute_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_SysmonService_Routes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/ListRoute")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/Routes")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_SysmonService_ListRoute_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_SysmonService_Routes_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -477,7 +694,76 @@ func RegisterSysmonServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 			return
 		}
 
-		forward_SysmonService_ListRoute_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_ListRoute_0{resp}, mux.GetForwardResponseOptions()...)
+		forward_SysmonService_Routes_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Routes_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_InterfaceAddresses_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/InterfaceAddresses")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_SysmonService_InterfaceAddresses_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_InterfaceAddresses_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_InterfaceAddresses_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_Interfaces_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/Interfaces")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_SysmonService_Interfaces_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_Interfaces_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Interfaces_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_InterfaceDetailsByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/InterfaceDetailsByName")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_SysmonService_InterfaceDetailsByName_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_InterfaceDetailsByName_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_InterfaceDetailsByName_0{resp}, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -521,6 +807,26 @@ func RegisterSysmonServiceHandler(ctx context.Context, mux *runtime.ServeMux, co
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "SysmonServiceClient" to call the correct interceptors.
 func RegisterSysmonServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client SysmonServiceClient) error {
+
+	mux.Handle("GET", pattern_SysmonService_Dong_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/Dong")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SysmonService_Dong_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_Dong_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Dong_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
 
 	mux.Handle("GET", pattern_SysmonService_Ping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -642,47 +948,116 @@ func RegisterSysmonServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 
 	})
 
-	mux.Handle("GET", pattern_SysmonService_ListRule_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_SysmonService_Rules_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/ListRule")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/Rules")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_SysmonService_ListRule_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_SysmonService_Rules_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_SysmonService_ListRule_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_ListRule_0{resp}, mux.GetForwardResponseOptions()...)
+		forward_SysmonService_Rules_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Rules_0{resp}, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_SysmonService_ListRoute_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_SysmonService_Routes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/ListRoute")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/Routes")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_SysmonService_ListRoute_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_SysmonService_Routes_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_SysmonService_ListRoute_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_ListRoute_0{resp}, mux.GetForwardResponseOptions()...)
+		forward_SysmonService_Routes_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Routes_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_InterfaceAddresses_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/InterfaceAddresses")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SysmonService_InterfaceAddresses_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_InterfaceAddresses_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_InterfaceAddresses_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_Interfaces_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/Interfaces")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SysmonService_Interfaces_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_Interfaces_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_Interfaces_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_InterfaceDetailsByName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/InterfaceDetailsByName")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SysmonService_InterfaceDetailsByName_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_InterfaceDetailsByName_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_InterfaceDetailsByName_0{resp}, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
+}
+
+type response_SysmonService_Dong_0 struct {
+	proto.Message
+}
+
+func (m response_SysmonService_Dong_0) XXX_ResponseBody() interface{} {
+	response := m.Message.(*DongRes)
+	return response.Response
 }
 
 type response_SysmonService_Ping_0 struct {
@@ -739,25 +1114,54 @@ func (m response_SysmonService_DelRoute_0) XXX_ResponseBody() interface{} {
 	return response.Response
 }
 
-type response_SysmonService_ListRule_0 struct {
+type response_SysmonService_Rules_0 struct {
 	proto.Message
 }
 
-func (m response_SysmonService_ListRule_0) XXX_ResponseBody() interface{} {
+func (m response_SysmonService_Rules_0) XXX_ResponseBody() interface{} {
 	response := m.Message.(*RuleRespone)
 	return response.Response
 }
 
-type response_SysmonService_ListRoute_0 struct {
+type response_SysmonService_Routes_0 struct {
 	proto.Message
 }
 
-func (m response_SysmonService_ListRoute_0) XXX_ResponseBody() interface{} {
+func (m response_SysmonService_Routes_0) XXX_ResponseBody() interface{} {
 	response := m.Message.(*RouteRespone)
 	return response.Response
 }
 
+type response_SysmonService_InterfaceAddresses_0 struct {
+	proto.Message
+}
+
+func (m response_SysmonService_InterfaceAddresses_0) XXX_ResponseBody() interface{} {
+	response := m.Message.(*InterfaceAddressesResponse)
+	return response.Response
+}
+
+type response_SysmonService_Interfaces_0 struct {
+	proto.Message
+}
+
+func (m response_SysmonService_Interfaces_0) XXX_ResponseBody() interface{} {
+	response := m.Message.(*InterfacesResponse)
+	return response.Response
+}
+
+type response_SysmonService_InterfaceDetailsByName_0 struct {
+	proto.Message
+}
+
+func (m response_SysmonService_InterfaceDetailsByName_0) XXX_ResponseBody() interface{} {
+	response := m.Message.(*InterfaceDetailsResponse)
+	return response.Response
+}
+
 var (
+	pattern_SysmonService_Dong_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "dong", "id"}, ""))
+
 	pattern_SysmonService_Ping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "ping"}, ""))
 
 	pattern_SysmonService_Pong_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "pong"}, ""))
@@ -770,12 +1174,20 @@ var (
 
 	pattern_SysmonService_DelRoute_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "delroute"}, ""))
 
-	pattern_SysmonService_ListRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "listrule"}, ""))
+	pattern_SysmonService_Rules_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "rules"}, ""))
 
-	pattern_SysmonService_ListRoute_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "listroute"}, ""))
+	pattern_SysmonService_Routes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "routes"}, ""))
+
+	pattern_SysmonService_InterfaceAddresses_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "interfaceaddresses"}, ""))
+
+	pattern_SysmonService_Interfaces_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "interfaces"}, ""))
+
+	pattern_SysmonService_InterfaceDetailsByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "interface", "interfaceName"}, ""))
 )
 
 var (
+	forward_SysmonService_Dong_0 = runtime.ForwardResponseMessage
+
 	forward_SysmonService_Ping_0 = runtime.ForwardResponseMessage
 
 	forward_SysmonService_Pong_0 = runtime.ForwardResponseMessage
@@ -788,7 +1200,13 @@ var (
 
 	forward_SysmonService_DelRoute_0 = runtime.ForwardResponseMessage
 
-	forward_SysmonService_ListRule_0 = runtime.ForwardResponseMessage
+	forward_SysmonService_Rules_0 = runtime.ForwardResponseMessage
 
-	forward_SysmonService_ListRoute_0 = runtime.ForwardResponseMessage
+	forward_SysmonService_Routes_0 = runtime.ForwardResponseMessage
+
+	forward_SysmonService_InterfaceAddresses_0 = runtime.ForwardResponseMessage
+
+	forward_SysmonService_Interfaces_0 = runtime.ForwardResponseMessage
+
+	forward_SysmonService_InterfaceDetailsByName_0 = runtime.ForwardResponseMessage
 )
