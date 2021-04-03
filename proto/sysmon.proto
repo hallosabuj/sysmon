@@ -96,6 +96,17 @@ message Gateway{
   string gateway      =2;
 }
 
+message IPTable{
+  string tableNumber    =1;
+  string tableName      =2;
+}
+message IPTables{
+  repeated IPTable  tables =1;
+}
+message IPTablesResponse{
+  IPTables response   =1;
+}
+
 message InterfaceDetails{
   string name =1;
 	repeated Gateway gateways  =2;
@@ -171,6 +182,12 @@ service SysmonService {
       response_body: "response"
     };
   }
+  rpc RoutesByTableName(Request) returns (RouteRespone) {
+    option (google.api.http) = {
+      get: "/api/v1/routes/{tableName}"
+      response_body: "response"
+    };
+  }
   rpc InterfaceAddresses(IPRequest) returns (InterfaceAddressesResponse) {
     option (google.api.http) = {
       get: "/api/v1/interfaceaddresses"
@@ -186,6 +203,12 @@ service SysmonService {
   rpc InterfaceDetailsByName(Request) returns (InterfaceDetailsResponse) {
     option (google.api.http) = {
       get: "/api/v1/interface/{interfaceName}"
+      response_body: "response"
+    };
+  }
+  rpc IpTables(Request) returns (IPTablesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/tables"
       response_body: "response"
     };
   }

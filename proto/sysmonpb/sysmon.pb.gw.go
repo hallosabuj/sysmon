@@ -344,6 +344,76 @@ func local_request_SysmonService_Routes_0(ctx context.Context, marshaler runtime
 }
 
 var (
+	filter_SysmonService_RoutesByTableName_0 = &utilities.DoubleArray{Encoding: map[string]int{"tableName": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
+func request_SysmonService_RoutesByTableName_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Request
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["tableName"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tableName")
+	}
+
+	protoReq.TableName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tableName", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_RoutesByTableName_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.RoutesByTableName(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_SysmonService_RoutesByTableName_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Request
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["tableName"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tableName")
+	}
+
+	protoReq.TableName, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tableName", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_RoutesByTableName_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.RoutesByTableName(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
 	filter_SysmonService_InterfaceAddresses_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
@@ -481,6 +551,42 @@ func local_request_SysmonService_InterfaceDetailsByName_0(ctx context.Context, m
 	}
 
 	msg, err := server.InterfaceDetailsByName(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
+	filter_SysmonService_IpTables_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_SysmonService_IpTables_0(ctx context.Context, marshaler runtime.Marshaler, client SysmonServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Request
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_IpTables_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.IpTables(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_SysmonService_IpTables_0(ctx context.Context, marshaler runtime.Marshaler, server SysmonServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq Request
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SysmonService_IpTables_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.IpTables(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -698,6 +804,29 @@ func RegisterSysmonServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 
 	})
 
+	mux.Handle("GET", pattern_SysmonService_RoutesByTableName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/RoutesByTableName")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_SysmonService_RoutesByTableName_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_RoutesByTableName_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_RoutesByTableName_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_SysmonService_InterfaceAddresses_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -764,6 +893,29 @@ func RegisterSysmonServiceHandlerServer(ctx context.Context, mux *runtime.ServeM
 		}
 
 		forward_SysmonService_InterfaceDetailsByName_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_InterfaceDetailsByName_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_IpTables_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/sysmonpb.SysmonService/IpTables")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_SysmonService_IpTables_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_IpTables_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_IpTables_0{resp}, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -988,6 +1140,26 @@ func RegisterSysmonServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 
 	})
 
+	mux.Handle("GET", pattern_SysmonService_RoutesByTableName_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/RoutesByTableName")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SysmonService_RoutesByTableName_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_RoutesByTableName_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_RoutesByTableName_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_SysmonService_InterfaceAddresses_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1045,6 +1217,26 @@ func RegisterSysmonServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 		}
 
 		forward_SysmonService_InterfaceDetailsByName_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_InterfaceDetailsByName_0{resp}, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_SysmonService_IpTables_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/sysmonpb.SysmonService/IpTables")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SysmonService_IpTables_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SysmonService_IpTables_0(ctx, mux, outboundMarshaler, w, req, response_SysmonService_IpTables_0{resp}, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1132,6 +1324,15 @@ func (m response_SysmonService_Routes_0) XXX_ResponseBody() interface{} {
 	return response.Response
 }
 
+type response_SysmonService_RoutesByTableName_0 struct {
+	proto.Message
+}
+
+func (m response_SysmonService_RoutesByTableName_0) XXX_ResponseBody() interface{} {
+	response := m.Message.(*RouteRespone)
+	return response.Response
+}
+
 type response_SysmonService_InterfaceAddresses_0 struct {
 	proto.Message
 }
@@ -1159,6 +1360,15 @@ func (m response_SysmonService_InterfaceDetailsByName_0) XXX_ResponseBody() inte
 	return response.Response
 }
 
+type response_SysmonService_IpTables_0 struct {
+	proto.Message
+}
+
+func (m response_SysmonService_IpTables_0) XXX_ResponseBody() interface{} {
+	response := m.Message.(*IPTablesResponse)
+	return response.Response
+}
+
 var (
 	pattern_SysmonService_Dong_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "dong", "id"}, ""))
 
@@ -1178,11 +1388,15 @@ var (
 
 	pattern_SysmonService_Routes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "routes"}, ""))
 
+	pattern_SysmonService_RoutesByTableName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "routes", "tableName"}, ""))
+
 	pattern_SysmonService_InterfaceAddresses_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "interfaceaddresses"}, ""))
 
 	pattern_SysmonService_Interfaces_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "interfaces"}, ""))
 
 	pattern_SysmonService_InterfaceDetailsByName_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "interface", "interfaceName"}, ""))
+
+	pattern_SysmonService_IpTables_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "tables"}, ""))
 )
 
 var (
@@ -1204,9 +1418,13 @@ var (
 
 	forward_SysmonService_Routes_0 = runtime.ForwardResponseMessage
 
+	forward_SysmonService_RoutesByTableName_0 = runtime.ForwardResponseMessage
+
 	forward_SysmonService_InterfaceAddresses_0 = runtime.ForwardResponseMessage
 
 	forward_SysmonService_Interfaces_0 = runtime.ForwardResponseMessage
 
 	forward_SysmonService_InterfaceDetailsByName_0 = runtime.ForwardResponseMessage
+
+	forward_SysmonService_IpTables_0 = runtime.ForwardResponseMessage
 )

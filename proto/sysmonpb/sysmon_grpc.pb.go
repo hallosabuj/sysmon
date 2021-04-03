@@ -27,9 +27,11 @@ type SysmonServiceClient interface {
 	DelRoute(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*IPResponse, error)
 	Rules(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*RuleRespone, error)
 	Routes(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*RouteRespone, error)
+	RoutesByTableName(ctx context.Context, in *Request, opts ...grpc.CallOption) (*RouteRespone, error)
 	InterfaceAddresses(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*InterfaceAddressesResponse, error)
 	Interfaces(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*InterfacesResponse, error)
 	InterfaceDetailsByName(ctx context.Context, in *Request, opts ...grpc.CallOption) (*InterfaceDetailsResponse, error)
+	IpTables(ctx context.Context, in *Request, opts ...grpc.CallOption) (*IPTablesResponse, error)
 }
 
 type sysmonServiceClient struct {
@@ -121,6 +123,15 @@ func (c *sysmonServiceClient) Routes(ctx context.Context, in *IPRequest, opts ..
 	return out, nil
 }
 
+func (c *sysmonServiceClient) RoutesByTableName(ctx context.Context, in *Request, opts ...grpc.CallOption) (*RouteRespone, error) {
+	out := new(RouteRespone)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/RoutesByTableName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *sysmonServiceClient) InterfaceAddresses(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*InterfaceAddressesResponse, error) {
 	out := new(InterfaceAddressesResponse)
 	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/InterfaceAddresses", in, out, opts...)
@@ -148,6 +159,15 @@ func (c *sysmonServiceClient) InterfaceDetailsByName(ctx context.Context, in *Re
 	return out, nil
 }
 
+func (c *sysmonServiceClient) IpTables(ctx context.Context, in *Request, opts ...grpc.CallOption) (*IPTablesResponse, error) {
+	out := new(IPTablesResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/IpTables", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SysmonServiceServer is the server API for SysmonService service.
 // All implementations must embed UnimplementedSysmonServiceServer
 // for forward compatibility
@@ -161,9 +181,11 @@ type SysmonServiceServer interface {
 	DelRoute(context.Context, *IPRequest) (*IPResponse, error)
 	Rules(context.Context, *IPRequest) (*RuleRespone, error)
 	Routes(context.Context, *IPRequest) (*RouteRespone, error)
+	RoutesByTableName(context.Context, *Request) (*RouteRespone, error)
 	InterfaceAddresses(context.Context, *IPRequest) (*InterfaceAddressesResponse, error)
 	Interfaces(context.Context, *IPRequest) (*InterfacesResponse, error)
 	InterfaceDetailsByName(context.Context, *Request) (*InterfaceDetailsResponse, error)
+	IpTables(context.Context, *Request) (*IPTablesResponse, error)
 	mustEmbedUnimplementedSysmonServiceServer()
 }
 
@@ -198,6 +220,9 @@ func (UnimplementedSysmonServiceServer) Rules(context.Context, *IPRequest) (*Rul
 func (UnimplementedSysmonServiceServer) Routes(context.Context, *IPRequest) (*RouteRespone, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Routes not implemented")
 }
+func (UnimplementedSysmonServiceServer) RoutesByTableName(context.Context, *Request) (*RouteRespone, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RoutesByTableName not implemented")
+}
 func (UnimplementedSysmonServiceServer) InterfaceAddresses(context.Context, *IPRequest) (*InterfaceAddressesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InterfaceAddresses not implemented")
 }
@@ -206,6 +231,9 @@ func (UnimplementedSysmonServiceServer) Interfaces(context.Context, *IPRequest) 
 }
 func (UnimplementedSysmonServiceServer) InterfaceDetailsByName(context.Context, *Request) (*InterfaceDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InterfaceDetailsByName not implemented")
+}
+func (UnimplementedSysmonServiceServer) IpTables(context.Context, *Request) (*IPTablesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IpTables not implemented")
 }
 func (UnimplementedSysmonServiceServer) mustEmbedUnimplementedSysmonServiceServer() {}
 
@@ -382,6 +410,24 @@ func _SysmonService_Routes_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SysmonService_RoutesByTableName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).RoutesByTableName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/RoutesByTableName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).RoutesByTableName(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _SysmonService_InterfaceAddresses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IPRequest)
 	if err := dec(in); err != nil {
@@ -436,6 +482,24 @@ func _SysmonService_InterfaceDetailsByName_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SysmonService_IpTables_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).IpTables(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/IpTables",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).IpTables(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SysmonService_ServiceDesc is the grpc.ServiceDesc for SysmonService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -480,6 +544,10 @@ var SysmonService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SysmonService_Routes_Handler,
 		},
 		{
+			MethodName: "RoutesByTableName",
+			Handler:    _SysmonService_RoutesByTableName_Handler,
+		},
+		{
 			MethodName: "InterfaceAddresses",
 			Handler:    _SysmonService_InterfaceAddresses_Handler,
 		},
@@ -490,6 +558,10 @@ var SysmonService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InterfaceDetailsByName",
 			Handler:    _SysmonService_InterfaceDetailsByName_Handler,
+		},
+		{
+			MethodName: "IpTables",
+			Handler:    _SysmonService_IpTables_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

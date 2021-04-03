@@ -90,3 +90,14 @@ func IPRoutes() map[string]string {
 	}
 	return result
 }
+
+func IPRoutesByTableName(request *sysmonpb.Request) map[string]string {
+	rules, _ := exec.Command("ip", "route", "list", "table", request.TableName).Output()
+	result := make(map[string]string)
+	var i = 1
+	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
+		result[strconv.Itoa(i)] = line
+		i = i + 1
+	}
+	return result
+}

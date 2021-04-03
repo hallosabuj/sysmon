@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"strconv"
+	"strings"
 	"sysmon/cmd/sysmon/api"
 	"sysmon/proto/sysmonpb"
 )
@@ -106,6 +107,20 @@ func (s *GRPCServer) Routes(ctxt context.Context, request *sysmonpb.IPRequest) (
 	}
 	return response, nil
 }
+func (s *GRPCServer) RoutesByTableName(ctxt context.Context, request *sysmonpb.Request) (*sysmonpb.RouteRespone, error) {
+	api.MakeSudo()
+	msg := api.IPRoutesByTableName(request)
+	var temp []*sysmonpb.Route
+	length := len(msg)
+	for i := 1; i < length+1; i++ {
+		temp = append(temp, &sysmonpb.Route{Index: strconv.Itoa(i), Route: msg[strconv.Itoa(i)]})
+	}
+	result := sysmonpb.Routes{Routes: temp}
+	response := &sysmonpb.RouteRespone{
+		Response: &result,
+	}
+	return response, nil
+}
 
 func (s *GRPCServer) InterfaceAddresses(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.InterfaceAddressesResponse, error) {
 	api.MakeSudo()
@@ -156,6 +171,20 @@ func (s *GRPCServer) InterfaceDetailsByName(ctxt context.Context, request *sysmo
 	}
 	result := sysmonpb.InterfaceDetails{Name: msg.Name, Gateways: gateways, NormalAddress: normalAddress, MulticastAddress: multicastAddress}
 	response := &sysmonpb.InterfaceDetailsResponse{
+		Response: &result,
+	}
+	return response, nil
+}
+
+func (s *GRPCServer) IpTables(ctxt context.Context, request *sysmonpb.Request) (*sysmonpb.IPTablesResponse, error) {
+	api.MakeSudo()
+	msg := api.Tables()
+	var temp []*sysmonpb.IPTable
+	for i := range msg {
+		temp = append(temp, &sysmonpb.IPTable{TableNumber: strings.Fields(msg[i])[0], TableName: strings.Fields(msg[i])[1]})
+	}
+	result := sysmonpb.IPTables{Tables: temp}
+	response := &sysmonpb.IPTablesResponse{
 		Response: &result,
 	}
 	return response, nil
