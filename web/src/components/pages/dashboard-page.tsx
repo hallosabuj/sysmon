@@ -23,8 +23,8 @@ export class DashboardPage extends React.Component<DashboardPageProps, Dashboard
         document.title = "Dashboard | SysMon"
         this.controller = new AbortController()
         this.periodicPing()
-        // this.doPing()
-        // this.doPong()
+        //  this.doPing()
+         //this.doPong()
     }
     componentWillUnmount(){
         if ( undefined !== this.controller) {

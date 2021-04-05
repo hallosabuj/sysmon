@@ -9,7 +9,7 @@ import {
 import { DashboardPage }     from "./pages/dashboard-page";
 import { RoutesPage }        from "./pages/routes-page";
 import { MetricsPage }       from "./pages/metrics-page";
-import { SamplePage } from "./pages/sample-page";
+import { SamplePage }        from "./pages/sample-page";
 
 interface AppState {
     sidebarOpen: boolean;
