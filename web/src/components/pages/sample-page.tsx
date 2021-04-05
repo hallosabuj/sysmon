@@ -19,6 +19,11 @@ export class SamplePage extends React.Component<SamplePageProps, SamplePageState
 
     componentDidMount(){
         document.title = "Sample | SysMon"
+        console.log('inside Didmount function')
+    }
+
+    componentWillUnmount(){
+        console.log('inside Willmount function')
     }
 
     render() {
