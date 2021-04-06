@@ -1,7 +1,7 @@
 type Optional<T> = T | undefined
 
 export interface IRule {
-    prioriry: string
+    priority: string
     rule: string
 }
 
@@ -10,10 +10,10 @@ export interface IRules {
 }
 
 export class Rule implements IRule {
-    prioriry: string 
+    priority: string 
     rule: string 
     constructor(){
-        this.prioriry=""
+        this.priority=""
         this.rule=""
     }
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InterfaceAddresses, InterfaceDetails, Interfaces, Routes,Route, Rules, Tables,GeneralRequest,GeneralResponse, Rule } from "../../models/route-models";
+import { InterfaceAddresses, InterfaceDetails, Interfaces,ITables, Routes,Route,IRules, Rules, Tables,GeneralRequest,GeneralResponse, Rule } from "../../models/route-models";
 import { 
 	Table, 
 	TableHeader, 
@@ -36,7 +36,6 @@ interface RoutesPageState {
 	rows : string[][]
     value : string
     routes:Promise<Routes>
-    rules:Promise<Rules>
     tables:Promise<Tables>
 }
 
@@ -60,7 +59,6 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 		    columns : ['Identifier', 'Name'],
 		    rows : [],
             routes:this.routes(),
-            rules:this.rules(),
             tables:this.tables(),
 		  };
 
@@ -100,9 +98,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log(temp)
     }
     //==========================================
-    async rules():Promise<Rules> {
-        let response=await (await fetch("/api/v1/rules")).json()
-        let temp:Rules=response
+    async rules():Promise<IRules> {
+        let response=await (await fetch("/api/v1/rules")).text()
+        let temp:IRules=JSON.parse(response)
         return temp
     }
     async addRule(payload:any) {
@@ -145,60 +143,51 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log(temp)
     }
     //================================================
-    async tables():Promise<Tables> {
+    async tables():Promise<ITables> {
         let response=await (await fetch("/api/v1/tables")).json()
-        let temp:Tables=response;
+        let temp:ITables=response;
         return temp
     }
     //==============================================
 
-    updateRoute(){
-        this.setState({
-            routes:this.routes()
-        })
-        this.state.routes.then((response)=>{
-            response.routes?.forEach((route)=>{
-                this.setState({
-                    rows_route:[
-                        ...this.state.rows_route,[route.index,route.route]
-                    ]
-                })
+    async updateRoute(){
+        let response=await this.routes()
+        if (response.routes){
+            let rows_route:string[][]
+            rows_route=[]
+            for(let i=0;i<response.routes?.length;i++){
+                rows_route=[...rows_route,[response.routes[i].index,response.routes[i].route]]
+            }
+            this.setState({
+                rows_route:rows_route
             })
-        })
+        }
     }
-    updateRules(){
-        this.setState({
-            rules:this.rules()
-        })
-        this.state.rules.then((response)=>{
-            console.log(response.rules)
-            response.rules?.forEach((rule)=>{
-                console.log(rule)
-                console.log(rule.prioriry)
-                console.log(rule.rule)
-                this.setState({
-                    rows_rule:[
-                        ...this.state.rows_rule,[rule.prioriry,rule.rule]
-                    ]
-                })
+    async updateRules(){
+        let response=await this.rules()
+        if (response.rules){
+            let rows_rule:string[][]
+            rows_rule=[]
+            for(let i=0;i<response.rules?.length;i++){
+                rows_rule=[...rows_rule,[response.rules[i].priority,response.rules[i].rule]]
+            }
+            this.setState({
+                rows_rule:rows_rule
             })
-        });
+        }
     }
-    updateTables(){
-        this.setState({
-            tables:this.tables()
-        })
-        this.state.tables.then((response)=>{
-            console.log(response.tables)
-            response.tables?.forEach((table)=>{
-                this.setState({
-                    rows:[
-                        ...this.state.rows,[table.tableNumber,table.tableName]
-                    ]
-                })
+    async updateTables(){
+        let response=await this.tables()
+        if (response.tables){
+            let tables:string[][]
+            tables=[]
+            for(let i=0;i<response.tables?.length;i++){
+                tables=[...tables,[response.tables[i].tableNumber,response.tables[i].tableName]]
+            }
+            this.setState({
+                rows:tables
             })
-        });
-        // console.log(this.state.tables)
+        }
     }
 
     componentDidMount(){
