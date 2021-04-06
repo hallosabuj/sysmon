@@ -10,6 +10,7 @@ import { DashboardPage }     from "./pages/dashboard-page";
 import { RoutesPage }        from "./pages/routes-page";
 import { MetricsPage }       from "./pages/metrics-page";
 import { SamplePage }        from "./pages/sample-page";
+import { SimpleTable }       from "./pages/table";
 
 interface AppState {
     sidebarOpen: boolean;
@@ -64,6 +65,9 @@ export class App extends React.Component<AppProps, AppState> {
                     <NavItem>
                         <NavLink exact to='/web/sample' activeClassName="pf-m-current">Sample</NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink exact to='/web/table' activeClassName="pf-m-current">Table</NavLink>
+                    </NavItem>
                 </NavList>
             </Nav>
         );
@@ -85,6 +89,9 @@ export class App extends React.Component<AppProps, AppState> {
                         </Route>
                         <Route exact path='/web/sample'>
                             <SamplePage> </SamplePage>
+                        </Route>
+                        <Route exact path='/web/table'>
+                            <SimpleTable></SimpleTable>
                         </Route>
                         <Route exact path='/'>
                             <Redirect to='/web/dashboard'> </Redirect>

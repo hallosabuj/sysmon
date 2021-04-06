@@ -29,7 +29,9 @@ export class SamplePage extends React.Component<SamplePageProps, SamplePageState
     render() {
         console.log('Rendering sample page ...')
         return (
-            <PageSection variant={PageSectionVariants.light}> This is sample page</PageSection>
+            <PageSection variant={PageSectionVariants.light}> 
+                This is sample page
+            </PageSection>
         );
     }
 }
