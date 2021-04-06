@@ -45,6 +45,7 @@ message RuleRespone{
 message Route{
   string index     =1;
   string route     =2;
+  string tableName  =3;
 }
 message Routes{
   repeated Route routes =1;

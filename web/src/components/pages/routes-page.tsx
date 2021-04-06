@@ -35,8 +35,6 @@ interface RoutesPageState {
 	columns : string[]
 	rows : string[][]
     value : string
-    routes:Promise<Routes>
-    tables:Promise<Tables>
 }
 
 interface RoutesPageProps {
@@ -52,14 +50,12 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             value : 'Hii',
             isModalOpen: false,
 			canSelectAll: true,
-			columns_route : ['Index', 'Route'],
+			columns_route : ['Index', 'Route','Table Name'],
 		    rows_route : [],
 		    columns_rule : ['Priority', 'Rule'],
 		    rows_rule : [],
 		    columns : ['Identifier', 'Name'],
 		    rows : [],
-            routes:this.routes(),
-            tables:this.tables(),
 		  };
 
 			// this.onSelect = this.onSelect.bind(this);
@@ -148,6 +144,16 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         let temp:ITables=response;
         return temp
     }
+    async addTable(payload:any){
+        let response=await (await fetch("/api/v1/addtable",{
+            method:"post",
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+        })).json()
+        let temp:GeneralResponse=response
+        console.log(response)
+        console.log(temp)
+    }
     //==============================================
 
     async updateRoute(){
@@ -156,7 +162,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             let rows_route:string[][]
             rows_route=[]
             for(let i=0;i<response.routes?.length;i++){
-                rows_route=[...rows_route,[response.routes[i].index,response.routes[i].route]]
+                rows_route=[...rows_route,[response.routes[i].index,response.routes[i].route,response.routes[i].tableName]]
             }
             this.setState({
                 rows_route:rows_route
@@ -229,7 +235,12 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         // this.interfaceByName(interfaceName)
         //==================================
         // this.tables()
-
+        let payload5:GeneralRequest=new GeneralRequest();
+        payload5.destination="192.168.122.13";
+        payload5.intermediate="192.168.122.1";
+        payload5.interfaceName="virbr0";
+        payload5.sourceIp="192.168.122.13";
+        this.addTable(payload5)
     }
     
     handleModalToggle () {

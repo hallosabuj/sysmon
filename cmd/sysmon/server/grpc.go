@@ -97,9 +97,8 @@ func (s *GRPCServer) Routes(ctxt context.Context, request *sysmonpb.IPRequest) (
 	api.MakeSudo()
 	msg := api.IPRoutes()
 	var temp []*sysmonpb.Route
-	length := len(msg)
-	for i := 1; i < length+1; i++ {
-		temp = append(temp, &sysmonpb.Route{Index: strconv.Itoa(i), Route: msg[strconv.Itoa(i)]})
+	for i := range msg {
+		temp = append(temp, &sysmonpb.Route{Index: msg[i].Index, Route: msg[i].Route, TableName: msg[i].TableName})
 	}
 	result := sysmonpb.Routes{Routes: temp}
 	response := &sysmonpb.RouteRespone{
@@ -111,9 +110,8 @@ func (s *GRPCServer) RoutesByTableName(ctxt context.Context, request *sysmonpb.R
 	api.MakeSudo()
 	msg := api.IPRoutesByTableName(request)
 	var temp []*sysmonpb.Route
-	length := len(msg)
-	for i := 1; i < length+1; i++ {
-		temp = append(temp, &sysmonpb.Route{Index: strconv.Itoa(i), Route: msg[strconv.Itoa(i)]})
+	for i := range msg {
+		temp = append(temp, &sysmonpb.Route{Index: msg[i].Index, Route: msg[i].Route, TableName: msg[i].TableName})
 	}
 	result := sysmonpb.Routes{Routes: temp}
 	response := &sysmonpb.RouteRespone{

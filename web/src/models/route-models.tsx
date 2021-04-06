@@ -52,6 +52,7 @@ export class Rules implements IRules {
 export interface IRoute {
     index: string 
     route: string 
+    tableName:string
 }
 
 export interface IRoutes {
@@ -61,9 +62,11 @@ export interface IRoutes {
 export class Route implements IRoute {
     index: string 
     route: string 
+    tableName:string
     constructor(){
         this.index=""
         this.route=""
+        this.tableName=""
     }
 }
 

@@ -91,7 +91,6 @@ func AddTable(request *sysmonpb.IPRequest) string {
 		}
 	}
 	if tableExists {
-		fmt.Println("Table exists...")
 		response = "Table exist"
 		request.Request.TableName = interfaceName + "_" + ip
 		response = response + "\n" + AddIPRule(request)
@@ -117,7 +116,7 @@ func AddTable(request *sysmonpb.IPRequest) string {
 		if _, err := file.WriteString(lineToAdd); err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println("Table added...")
+		response = "Table added..."
 		request.Request.TableName = newTableName
 		response = response + "\n" + AddIPRule(request)
 		response = response + "\n" + strings.TrimSuffix(AddIPRoute(request), "\n")
