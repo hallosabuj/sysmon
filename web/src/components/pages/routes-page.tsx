@@ -20,7 +20,11 @@ import {
     Modal,
     PageSection, 
 	PageSectionVariants,
-	Stack, 
+	Stack,
+    Form,
+    FormGroup,
+    ActionGroup,
+    TextInput, 
 } from '@patternfly/react-core';
 import { MinusIcon, PlusCircleIcon, PlusIcon, RedoIcon, TrashIcon } from '@patternfly/react-icons';
 
@@ -34,7 +38,10 @@ interface RoutesPageState {
 	rows_rule : string[][]
 	columns : string[]
 	rows : string[][]
-    value : string
+    srcIP : string
+    dstIP : string
+    defaultGateway : string
+    interfaceName : string
 }
 
 interface RoutesPageProps {
@@ -47,7 +54,10 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
     constructor(props: RoutesPageProps) {
         super(props);
         this.state = {
-            value : 'Hii',
+            srcIP: '',
+            dstIP: '',
+            defaultGateway: '',
+            interfaceName: '',
             isModalOpen: false,
 			canSelectAll: true,
 			columns_route : ['Index', 'Route'],
@@ -70,10 +80,11 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 		    ],
 		  };
 
-			// this.onSelect = this.onSelect.bind(this);
-			// this.toggleSelect = this.toggleSelect.bind(this);
+		    this.onSelect = this.onSelect.bind(this);
+		    this.toggleSelect = this.toggleSelect.bind(this);
             this.handleModalToggle = this.handleModalToggle.bind(this);
-            this.handleModalInput = this.handleModalInput.bind(this);
+            this.handleChange = this.handleChange.bind(this);
+            this.handleSubmit = this.handleSubmit.bind(this);
     }
     async routes() {
         let response=await (await fetch("/api/v1/routes")).json()
@@ -206,31 +217,83 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
           isModalOpen: !isModalOpen
         }));
       }
-    handleModalInput () {
-        console.log(this.state.value)
-        this.setState (({ value, isModalOpen }) => ({
-            value: value,
-            isModalOpen: !isModalOpen
-        }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
-      }  
-    // onSelect(event : Event, isSelected : boolean, rowId : number) {
-		// 	let rows = this.state.rows_rule.map((oneRow, index) => {
-		// 		oneRow.selected = rowId === index;
-		// 		return oneRow;
-		// 	  });
-		// 	  this.setState({
-		// 		rows
-		// 	  });
-		//   }
+    // handleModalInput () {
+    //     console.log(this.state.value)
+    //     this.setState (({ value, isModalOpen }) => ({
+    //         value: value,
+    //         isModalOpen: !isModalOpen
+    //     }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
+    //   }  
+    //handleTextInputChange  (value1 : string, value2 : string, value3 : string) {
+    // handleTextInputChange  (event : MouseEvent) {    
+    //     // this.setState({ value1 });
+    //     // this.setState({ value2 });
+    //     // this.setState({ value3 });
+    //     this.setState({ event. });
+    //     this.setState({ value2 });
+    //     this.setState({ value3 });
+    //   };
+  
+    onSelect(event : Event, isSelected : boolean, rowId : number) {
+			let rows = this.state.rows_rule.map((oneRow, index) => {
+				oneRow.selected = rowId === index;
+				return oneRow;
+			  });
+			  this.setState({
+				rows
+			  });
+		  }
 
-		// toggleSelect(checked : boolean) {
-		// 	this.setState({
-		// 	  canSelectAll: checked
-		// 	});
-		//   } 
+		toggleSelect(checked : boolean) {
+			this.setState({
+			  canSelectAll: checked
+			});
+		  } 
+    handleChange(value: string, event: React.FormEvent<HTMLInputElement>) {
+            const id = event.currentTarget.id;
+            const newValue = event.currentTarget.value;
+            if (id == "simple-form-src-ip-01") {
+                console.log("interface ",newValue)
+                this.setState({
+                  srcIP :newValue
+                });
+            }
+            if (id == "simple-form-dst-ip-01") {
+                console.log("interface ",newValue)
+                this.setState({
+                  dstIP :newValue
+                });
+            }
+            if (id == "simple-form-gateway-01") {
+                console.log("interface ",newValue)
+                this.setState({
+                  defaultGateway :newValue
+                });
+            }
+            if (id == "simple-form-interface-01") {
+                console.log("interface ",newValue)
+                this.setState({
+                  interfaceName :newValue
+                });
+            }
+           }         
+         handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
+            var pkt = {
+                srcIP : this.state.srcIP,
+                dstIP : this.state.dstIP,
+                defaultGateway : this.state.defaultGateway,
+                interfaceName : this.state.interfaceName
+            };
+           
+            
+            const objJSON = JSON.stringify(pkt)
+            console.log(objJSON);
+            //alert('A name was submitted: ' + this.state.value1);
+            event.preventDefault();
+          }
     render() {
         console.log('Rendering routes page ...')
-        const { value, isModalOpen, canSelectAll, columns_route, columns_rule, columns, rows_route, rows_rule, rows } = this.state;
+        const { srcIP, dstIP, defaultGateway, interfaceName, isModalOpen, canSelectAll, columns_route, columns_rule, columns, rows_route, rows_rule, rows } = this.state;
 	  
 		  return ( 	
           <div>    		
@@ -247,7 +310,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 						</CardActions>
 					</CardHeader>
 					<CardBody>
-						{/* <Checkbox
+						<Checkbox
 						label="Can select all"
 						className="pf-u-mb-lg"
 						isChecked={canSelectAll}
@@ -255,9 +318,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 						aria-label="toggle select all checkbox"
 						id="toggle-select-all"
 						name="toggle-select-all"
-						/> */}
+						/>
 						<Table
-						//onSelect={this.onSelect}
+						onSelect={this.onSelect}
 						//selectVariant={RowSelectVariant.radio}
 						aria-label="Selectable Table"
 						cells={columns_rule}
@@ -315,32 +378,65 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 						</Table>
 					</CardBody>
 				</Card>
-			</PageSection>
-            
+			</PageSection>        
         </Stack>
         <Modal
         title="Simple modal header"
         isOpen={isModalOpen}
         onClose={this.handleModalToggle}
-        actions={[
-            // <Button key="confirm" variant="primary" onClick={this.handleModalInput}>
-            // Confirm
-            // </Button>,
-            <Button key="cancel" variant="link" onClick={this.handleModalToggle}>
-            Cancel
-            </Button>
-        ]}
         >
-        Enter your name: <input
+         <Form>
+         <FormGroup label="Source IP Address"
+          isRequired
+          fieldId="simple-form-src-ip-01"
+        > 
+        <TextInput
+            isRequired
             type="text"
-            
-            //value={this.state.value}
-            defaultValue="Hello!"
-            //onSubmit={this.handleModalInput}
-         />  
-         <Button key="confirm" variant="primary" onClick={this.handleModalInput}>
-            Confirm
-        </Button>,
+            id="simple-form-src-ip-01"
+            name="simple-form-src-ip-01"
+            aria-describedby="simple-form-src-ip-01-helper"
+            value={this.state.srcIP}
+            onChange={this.handleChange}
+          />
+        </FormGroup>
+        <FormGroup label="Destination IP Address" isRequired fieldId="simple-form-dst-ip-01">
+          <TextInput
+            isRequired
+            type="text"
+            id="simple-form-dst-ip-01"
+            name="simple-form-dst-ip-01"
+            value={this.state.dstIP}
+            onChange={this.handleChange}
+          />
+        </FormGroup> 
+        <FormGroup label="Gateway" isRequired fieldId="simple-form-gateway-01">
+          <TextInput
+            isRequired
+            type="tel"
+            id="simple-form-gateway-01"
+            name="simple-form-gateway-01"
+            value={this.state.defaultGateway}
+            onChange={this.handleChange}
+          />
+        </FormGroup>
+        <FormGroup label="Interface Name" isRequired fieldId="simple-form-interface-01">
+          <TextInput
+            isRequired
+            type="tel"
+            id="simple-form-interface-01"
+            name="simple-form-interface-01"
+            value={this.state.interfaceName}
+           onChange={this.handleChange}
+          />
+        </FormGroup>
+        <ActionGroup>
+          <Button key="confirm" variant="primary" onClick={this.handleSubmit}>
+            Confirm</Button>,
+          <Button key="cancel" variant="link" onClick={this.handleModalToggle}>
+            Cancel</Button>
+        </ActionGroup>
+        </Form>
         </Modal>
 		</div> 
          );
