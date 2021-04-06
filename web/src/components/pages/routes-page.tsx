@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InterfaceAddresses, InterfaceDetails, Interfaces, Routes, Rules, Tables,GeneralRequest,GeneralResponse } from "../../models/route-models";
+import { InterfaceAddresses, InterfaceDetails, Interfaces, Routes,Route, Rules, Tables,GeneralRequest,GeneralResponse, Rule } from "../../models/route-models";
 import { 
 	Table, 
 	TableHeader, 
@@ -35,6 +35,9 @@ interface RoutesPageState {
 	columns : string[]
 	rows : string[][]
     value : string
+    routes:Promise<Routes>
+    rules:Promise<Rules>
+    tables:Promise<Tables>
 }
 
 interface RoutesPageProps {
@@ -51,23 +54,14 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             isModalOpen: false,
 			canSelectAll: true,
 			columns_route : ['Index', 'Route'],
-		    rows_route : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+		    rows_route : [],
 		    columns_rule : ['Priority', 'Rule'],
-		    rows_rule : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+		    rows_rule : [],
 		    columns : ['Identifier', 'Name'],
-		    rows : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+		    rows : [],
+            routes:this.routes(),
+            rules:this.rules(),
+            tables:this.tables(),
 		  };
 
 			// this.onSelect = this.onSelect.bind(this);
@@ -75,11 +69,11 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             this.handleModalToggle = this.handleModalToggle.bind(this);
             this.handleModalInput = this.handleModalInput.bind(this);
     }
-    async routes() {
+
+    async routes() :Promise<Routes> {
         let response=await (await fetch("/api/v1/routes")).json()
         let temp:Routes=response
-        console.log(temp)
-        console.log(response)
+        return temp
     }
     async routesByTableName(tableName:string) {
         let response=await (await fetch(`/api/v1/routes/${tableName}`)).json()
@@ -106,11 +100,10 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log(temp)
     }
     //==========================================
-    async rules() {
+    async rules():Promise<Rules> {
         let response=await (await fetch("/api/v1/rules")).json()
-        console.log(response)
         let temp:Rules=response
-        console.log(temp)
+        return temp
     }
     async addRule(payload:any) {
         let response=await (await fetch("/api/v1/addrule",{
@@ -152,18 +145,67 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log(temp)
     }
     //================================================
-    async tables() {
+    async tables():Promise<Tables> {
         let response=await (await fetch("/api/v1/tables")).json()
         let temp:Tables=response;
-        console.log(response)
-        console.log(temp)
+        return temp
     }
+    //==============================================
 
-
+    updateRoute(){
+        this.setState({
+            routes:this.routes()
+        })
+        this.state.routes.then((response)=>{
+            response.routes?.forEach((route)=>{
+                this.setState({
+                    rows_route:[
+                        ...this.state.rows_route,[route.index,route.route]
+                    ]
+                })
+            })
+        })
+    }
+    updateRules(){
+        this.setState({
+            rules:this.rules()
+        })
+        this.state.rules.then((response)=>{
+            console.log(response.rules)
+            response.rules?.forEach((rule)=>{
+                console.log(rule)
+                console.log(rule.prioriry)
+                console.log(rule.rule)
+                this.setState({
+                    rows_rule:[
+                        ...this.state.rows_rule,[rule.prioriry,rule.rule]
+                    ]
+                })
+            })
+        });
+    }
+    updateTables(){
+        this.setState({
+            tables:this.tables()
+        })
+        this.state.tables.then((response)=>{
+            console.log(response.tables)
+            response.tables?.forEach((table)=>{
+                this.setState({
+                    rows:[
+                        ...this.state.rows,[table.tableNumber,table.tableName]
+                    ]
+                })
+            })
+        });
+        // console.log(this.state.tables)
+    }
 
     componentDidMount(){
         document.title = "Routes | SysMon"
-        // this.routes()
+        this.updateRoute()
+        this.updateRules()
+        this.updateTables()
         // this.routesByTableName("main")
         // For addroute
         const payload1:GeneralRequest=new GeneralRequest()
@@ -208,11 +250,19 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
       }
     handleModalInput () {
         console.log(this.state.value)
-        this.setState (({ value, isModalOpen }) => ({
-            value: value,
-            isModalOpen: !isModalOpen
-        }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
+        // let temp=document.getElementById("name").
+
+        this.setState(prev => ({
+            value: "dd"
+          }))
+          console.log(this.state.value)
+
+        // this.setState (({ value, isModalOpen }) => ({
+        //     value: value,
+        //     isModalOpen: !isModalOpen
+        // }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
       }  
+      
     // onSelect(event : Event, isSelected : boolean, rowId : number) {
 		// 	let rows = this.state.rows_rule.map((oneRow, index) => {
 		// 		oneRow.selected = rowId === index;
@@ -323,9 +373,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         isOpen={isModalOpen}
         onClose={this.handleModalToggle}
         actions={[
-            // <Button key="confirm" variant="primary" onClick={this.handleModalInput}>
-            // Confirm
-            // </Button>,
+            <Button key="confirm" variant="primary">
+            Confirm
+            </Button>,
             <Button key="cancel" variant="link" onClick={this.handleModalToggle}>
             Cancel
             </Button>
@@ -333,14 +383,14 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         >
         Enter your name: <input
             type="text"
-            
-            //value={this.state.value}
+            id="name"
+            // value={this.state.value}
             defaultValue="Hello!"
             //onSubmit={this.handleModalInput}
          />  
-         <Button key="confirm" variant="primary" onClick={this.handleModalInput}>
+         {/* <Button key="confirm" variant="primary" onClick={this.handleModalInput}>
             Confirm
-        </Button>,
+        </Button>, */}
         </Modal>
 		</div> 
          );
