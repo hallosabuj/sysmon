@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fmt"
+	"bytes"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -33,10 +33,11 @@ func AddIPRoute(request *sysmonpb.IPRequest) string {
 
 	if !flag {
 		cmd := exec.Command("sudo", "ip", "route", "add", destination, "via", intermediate, "dev", net_interface, "table", table_name)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 		if err != nil {
-			fmt.Println("Error here : ", err)
-			response = "Error"
+			response = stderr.String()
 		} else {
 			response = "Route added"
 		}
@@ -66,11 +67,12 @@ func DelIPRoute(request *sysmonpb.IPRequest) string {
 
 	if flag {
 		cmd := exec.Command("sudo", "ip", "route", "del", destination, "table", table_name)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 
 		if err != nil {
-			fmt.Println("Error here : ", err)
-			response = "Error"
+			response = stderr.String()
 		} else {
 			response = "Route deleted"
 		}

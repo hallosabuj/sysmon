@@ -71,7 +71,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             body: JSON.stringify(payload)
         })).json()
         let temp:GeneralResponse=response
-        //console.log(response)
+        // console.log(response)
         console.log(temp)
     }
     //============================================

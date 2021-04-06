@@ -189,3 +189,12 @@ func (s *GRPCServer) IpTables(ctxt context.Context, request *sysmonpb.Request) (
 	}
 	return response, nil
 }
+
+func (s *GRPCServer) AddTable(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.Response, error) {
+	api.MakeSudo()
+	msg := api.AddTable(request)
+	response := &sysmonpb.Response{
+		Msg: msg,
+	}
+	return response, nil
+}

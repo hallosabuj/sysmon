@@ -212,4 +212,11 @@ service SysmonService {
       response_body: "response"
     };
   }
+  rpc AddTable(IPRequest) returns (Response) {
+    option (google.api.http) = {
+      post: "/api/v1/addtable"
+      body: "request"
+      response_body: "msg"
+    };
+  }
 }
