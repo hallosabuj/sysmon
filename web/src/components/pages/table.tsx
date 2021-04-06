@@ -52,10 +52,10 @@ export class SimpleTable extends React.Component<TablePageProps, TablePageStates
 		    ],
 		    columns_rule : ['Priority', 'Rule'],
 		    rows_rule : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+				['Repository one', 'Branch one'],
+				['Repository two', 'Branch two'],
+				['Repository three', 'Branch three']
+			],
 		    columns : ['Identifier', 'Name'],
 		    rows : [
 			['Repository one', 'Branch one'],

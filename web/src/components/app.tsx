@@ -11,6 +11,7 @@ import { RoutesPage }        from "./pages/routes-page";
 import { MetricsPage }       from "./pages/metrics-page";
 import { SamplePage }        from "./pages/sample-page";
 import { SimpleTable }       from "./pages/table";
+import {STable}              from "./pages/simple-table"
 
 interface AppState {
     sidebarOpen: boolean;
@@ -68,6 +69,9 @@ export class App extends React.Component<AppProps, AppState> {
                     <NavItem>
                         <NavLink exact to='/web/table' activeClassName="pf-m-current">Table</NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink exact to='/web/stable' activeClassName="pf-m-current">Simple Table</NavLink>
+                    </NavItem>
                 </NavList>
             </Nav>
         );
@@ -92,6 +96,9 @@ export class App extends React.Component<AppProps, AppState> {
                         </Route>
                         <Route exact path='/web/table'>
                             <SimpleTable></SimpleTable>
+                        </Route>
+                        <Route exact path='/web/stable'>
+                            <STable></STable>
                         </Route>
                         <Route exact path='/'>
                             <Redirect to='/web/dashboard'> </Redirect>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InterfaceAddresses, InterfaceDetails, Interfaces, Routes, Rules, Tables,GeneralRequest,GeneralResponse } from "../../models/route-models";
+import { InterfaceAddresses, InterfaceDetails, Interfaces,ITables, Routes,Route,IRules, Rules, Tables,GeneralRequest,GeneralResponse, Rule } from "../../models/route-models";
 import { 
 	Table, 
 	TableHeader, 
@@ -60,37 +60,25 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             interfaceName: '',
             isModalOpen: false,
 			canSelectAll: true,
-			columns_route : ['Index', 'Route'],
-		    rows_route : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+			columns_route : ['Index', 'Route','Table Name'],
+		    rows_route : [],
 		    columns_rule : ['Priority', 'Rule'],
-		    rows_rule : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+		    rows_rule : [],
 		    columns : ['Identifier', 'Name'],
-		    rows : [
-			['Repository one', 'Branch one'],
-			['Repository two', 'Branch two'],
-			['Repository three', 'Branch three']
-		    ],
+		    rows : [],
 		  };
 
-		    this.onSelect = this.onSelect.bind(this);
+		    //this.onSelect = this.onSelect.bind(this);
 		    this.toggleSelect = this.toggleSelect.bind(this);
             this.handleModalToggle = this.handleModalToggle.bind(this);
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
     }
-    async routes() {
+
+    async routes() :Promise<Routes> {
         let response=await (await fetch("/api/v1/routes")).json()
         let temp:Routes=response
-        console.log(temp)
-        console.log(response)
+        return temp
     }
     async routesByTableName(tableName:string) {
         let response=await (await fetch(`/api/v1/routes/${tableName}`)).json()
@@ -117,11 +105,10 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log(temp)
     }
     //==========================================
-    async rules() {
-        let response=await (await fetch("/api/v1/rules")).json()
-        console.log(response)
-        let temp:Rules=response
-        console.log(temp)
+    async rules():Promise<IRules> {
+        let response=await (await fetch("/api/v1/rules")).text()
+        let temp:IRules=JSON.parse(response)
+        return temp
     }
     async addRule(payload:any) {
         let response=await (await fetch("/api/v1/addrule",{
@@ -140,7 +127,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             body: JSON.stringify(payload)
         })).json()
         let temp:GeneralResponse=response
-        //console.log(response)
+        // console.log(response)
         console.log(temp)
     }
     //============================================
@@ -163,18 +150,68 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log(temp)
     }
     //================================================
-    async tables() {
+    async tables():Promise<ITables> {
         let response=await (await fetch("/api/v1/tables")).json()
-        let temp:Tables=response;
+        let temp:ITables=response;
+        return temp
+    }
+    async addTable(payload:any){
+        let response=await (await fetch("/api/v1/addtable",{
+            method:"post",
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+        })).json()
+        let temp:GeneralResponse=response
         console.log(response)
         console.log(temp)
     }
+    //==============================================
 
-
+    async updateRoute(){
+        let response=await this.routes()
+        if (response.routes){
+            let rows_route:string[][]
+            rows_route=[]
+            for(let i=0;i<response.routes?.length;i++){
+                rows_route=[...rows_route,[response.routes[i].index,response.routes[i].route,response.routes[i].tableName]]
+            }
+            this.setState({
+                rows_route:rows_route
+            })
+        }
+    }
+    async updateRules(){
+        let response=await this.rules()
+        if (response.rules){
+            let rows_rule:string[][]
+            rows_rule=[]
+            for(let i=0;i<response.rules?.length;i++){
+                rows_rule=[...rows_rule,[response.rules[i].priority,response.rules[i].rule]]
+            }
+            this.setState({
+                rows_rule:rows_rule
+            })
+        }
+    }
+    async updateTables(){
+        let response=await this.tables()
+        if (response.tables){
+            let tables:string[][]
+            tables=[]
+            for(let i=0;i<response.tables?.length;i++){
+                tables=[...tables,[response.tables[i].tableNumber,response.tables[i].tableName]]
+            }
+            this.setState({
+                rows:tables
+            })
+        }
+    }
 
     componentDidMount(){
         document.title = "Routes | SysMon"
-        // this.routes()
+        this.updateRoute()
+        this.updateRules()
+        this.updateTables()
         // this.routesByTableName("main")
         // For addroute
         const payload1:GeneralRequest=new GeneralRequest()
@@ -209,7 +246,12 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         // this.interfaceByName(interfaceName)
         //==================================
         // this.tables()
-
+        let payload5:GeneralRequest=new GeneralRequest();
+        payload5.destination="192.168.122.13";
+        payload5.intermediate="192.168.122.1";
+        payload5.interfaceName="virbr0";
+        payload5.sourceIp="192.168.122.13";
+        this.addTable(payload5)
     }
     
     handleModalToggle () {
@@ -219,37 +261,35 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
       }
     // handleModalInput () {
     //     console.log(this.state.value)
-    //     this.setState (({ value, isModalOpen }) => ({
-    //         value: value,
-    //         isModalOpen: !isModalOpen
-    //     }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
+    //     // let temp=document.getElementById("name").
+
+    //     this.setState(prev => ({
+    //         value: "dd"
+    //       }))
+    //       console.log(this.state.value)
+
+    //     // this.setState (({ value, isModalOpen }) => ({
+    //     //     value: value,
+    //     //     isModalOpen: !isModalOpen
+    //     // }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
     //   }  
-    //handleTextInputChange  (value1 : string, value2 : string, value3 : string) {
-    // handleTextInputChange  (event : MouseEvent) {    
-    //     // this.setState({ value1 });
-    //     // this.setState({ value2 });
-    //     // this.setState({ value3 });
-    //     this.setState({ event. });
-    //     this.setState({ value2 });
-    //     this.setState({ value3 });
-    //   };
-  
-    onSelect(event : Event, isSelected : boolean, rowId : number) {
-			let rows = this.state.rows_rule.map((oneRow, index) => {
-				oneRow.selected = rowId === index;
-				return oneRow;
-			  });
-			  this.setState({
-				rows
-			  });
-		  }
+      
+    // onSelect(event : Event, isSelected : boolean, rowId : number) {
+		// 	let rows = this.state.rows_rule.map((oneRow, index) => {
+		// 		oneRow.selected = rowId === index;
+		// 		return oneRow;
+		// 	  });
+		// 	  this.setState({
+		// 		rows
+		// 	  });
+		//   }
 
 		toggleSelect(checked : boolean) {
 			this.setState({
 			  canSelectAll: checked
 			});
 		  } 
-    handleChange(value: string, event: React.FormEvent<HTMLInputElement>) {
+        handleChange(value: string, event: React.FormEvent<HTMLInputElement>) {
             const id = event.currentTarget.id;
             const newValue = event.currentTarget.value;
             if (id == "simple-form-src-ip-01") {
@@ -310,7 +350,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 						</CardActions>
 					</CardHeader>
 					<CardBody>
-						<Checkbox
+						{/* <Checkbox
 						label="Can select all"
 						className="pf-u-mb-lg"
 						isChecked={canSelectAll}
@@ -318,9 +358,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 						aria-label="toggle select all checkbox"
 						id="toggle-select-all"
 						name="toggle-select-all"
-						/>
+						/> */}
 						<Table
-						onSelect={this.onSelect}
+						//onSelect={this.onSelect}
 						//selectVariant={RowSelectVariant.radio}
 						aria-label="Selectable Table"
 						cells={columns_rule}

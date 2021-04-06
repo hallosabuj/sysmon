@@ -32,6 +32,7 @@ type SysmonServiceClient interface {
 	Interfaces(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*InterfacesResponse, error)
 	InterfaceDetailsByName(ctx context.Context, in *Request, opts ...grpc.CallOption) (*InterfaceDetailsResponse, error)
 	IpTables(ctx context.Context, in *Request, opts ...grpc.CallOption) (*IPTablesResponse, error)
+	AddTable(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*Response, error)
 }
 
 type sysmonServiceClient struct {
@@ -168,6 +169,15 @@ func (c *sysmonServiceClient) IpTables(ctx context.Context, in *Request, opts ..
 	return out, nil
 }
 
+func (c *sysmonServiceClient) AddTable(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/AddTable", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SysmonServiceServer is the server API for SysmonService service.
 // All implementations must embed UnimplementedSysmonServiceServer
 // for forward compatibility
@@ -186,6 +196,7 @@ type SysmonServiceServer interface {
 	Interfaces(context.Context, *IPRequest) (*InterfacesResponse, error)
 	InterfaceDetailsByName(context.Context, *Request) (*InterfaceDetailsResponse, error)
 	IpTables(context.Context, *Request) (*IPTablesResponse, error)
+	AddTable(context.Context, *IPRequest) (*Response, error)
 	mustEmbedUnimplementedSysmonServiceServer()
 }
 
@@ -234,6 +245,9 @@ func (UnimplementedSysmonServiceServer) InterfaceDetailsByName(context.Context, 
 }
 func (UnimplementedSysmonServiceServer) IpTables(context.Context, *Request) (*IPTablesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IpTables not implemented")
+}
+func (UnimplementedSysmonServiceServer) AddTable(context.Context, *IPRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTable not implemented")
 }
 func (UnimplementedSysmonServiceServer) mustEmbedUnimplementedSysmonServiceServer() {}
 
@@ -500,6 +514,24 @@ func _SysmonService_IpTables_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SysmonService_AddTable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).AddTable(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/AddTable",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).AddTable(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SysmonService_ServiceDesc is the grpc.ServiceDesc for SysmonService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -562,6 +594,10 @@ var SysmonService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IpTables",
 			Handler:    _SysmonService_IpTables_Handler,
+		},
+		{
+			MethodName: "AddTable",
+			Handler:    _SysmonService_AddTable_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

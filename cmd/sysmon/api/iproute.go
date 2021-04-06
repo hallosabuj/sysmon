@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fmt"
+	"bytes"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -33,10 +33,11 @@ func AddIPRoute(request *sysmonpb.IPRequest) string {
 
 	if !flag {
 		cmd := exec.Command("sudo", "ip", "route", "add", destination, "via", intermediate, "dev", net_interface, "table", table_name)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 		if err != nil {
-			fmt.Println("Error here : ", err)
-			response = "Error"
+			response = stderr.String()
 		} else {
 			response = "Route added"
 		}
@@ -66,11 +67,12 @@ func DelIPRoute(request *sysmonpb.IPRequest) string {
 
 	if flag {
 		cmd := exec.Command("sudo", "ip", "route", "del", destination, "table", table_name)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 
 		if err != nil {
-			fmt.Println("Error here : ", err)
-			response = "Error"
+			response = stderr.String()
 		} else {
 			response = "Route deleted"
 		}
@@ -80,24 +82,36 @@ func DelIPRoute(request *sysmonpb.IPRequest) string {
 	return response
 }
 
-func IPRoutes() map[string]string {
-	rules, _ := exec.Command("ip", "route", "list").Output()
-	result := make(map[string]string)
-	var i = 1
-	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
-		result[strconv.Itoa(i)] = line
-		i = i + 1
+type Routes struct {
+	Index     string
+	Route     string
+	TableName string
+}
+
+func IPRoutes() []Routes {
+	tables := Tables()
+	var result []Routes
+	index := 1
+	for j := range tables {
+		temp := IPRoutesByTableName(&sysmonpb.Request{TableName: strings.Fields(tables[j])[1]})
+		for i := range temp {
+			temp[i].Index = strconv.Itoa(index)
+			result = append(result, temp[i])
+			index += 1
+		}
 	}
 	return result
 }
 
-func IPRoutesByTableName(request *sysmonpb.Request) map[string]string {
+func IPRoutesByTableName(request *sysmonpb.Request) []Routes {
 	rules, _ := exec.Command("ip", "route", "list", "table", request.TableName).Output()
-	result := make(map[string]string)
+	var result []Routes
 	var i = 1
 	for _, line := range strings.Split(strings.TrimSuffix(string(rules), "\n"), "\n") {
-		result[strconv.Itoa(i)] = line
-		i = i + 1
+		if line != "" {
+			result = append(result, Routes{Index: strconv.Itoa(i), Route: line, TableName: request.TableName})
+			i = i + 1
+		}
 	}
 	return result
 }

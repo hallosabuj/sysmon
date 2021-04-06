@@ -1,8 +1,8 @@
 type Optional<T> = T | undefined
 
 export interface IRule {
-    prioriry: string | undefined
-    rule: string | undefined
+    priority: string
+    rule: string
 }
 
 export interface IRules {
@@ -10,8 +10,12 @@ export interface IRules {
 }
 
 export class Rule implements IRule {
-    prioriry: string | undefined
-    rule: string | undefined
+    priority: string 
+    rule: string 
+    constructor(){
+        this.priority=""
+        this.rule=""
+    }
 
     // constructor(arg: Optional<IRule> ) {
     //     if (!arg) {
@@ -46,8 +50,9 @@ export class Rules implements IRules {
 }
 //================================================
 export interface IRoute {
-    index: string | undefined
-    route: string | undefined
+    index: string 
+    route: string 
+    tableName:string
 }
 
 export interface IRoutes {
@@ -55,8 +60,14 @@ export interface IRoutes {
 }
 
 export class Route implements IRoute {
-    index: string | undefined
-    route: string | undefined
+    index: string 
+    route: string 
+    tableName:string
+    constructor(){
+        this.index=""
+        this.route=""
+        this.tableName=""
+    }
 }
 
 export class Routes implements IRoutes {
@@ -68,8 +79,8 @@ export class Routes implements IRoutes {
 }
 //================================================
 export interface ITable {
-    index: string | undefined
-    route: string | undefined
+    tableNumber: string
+    tableName: string
 }
 
 export interface ITables {
@@ -77,8 +88,12 @@ export interface ITables {
 }
 
 export class Table implements ITable {
-    index: string | undefined
-    route: string | undefined
+    tableNumber: string 
+    tableName: string 
+    constructor(){
+        this.tableNumber=""
+        this.tableName=""
+    }
 }
 
 export class Tables implements ITables {

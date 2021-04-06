@@ -45,6 +45,7 @@ message RuleRespone{
 message Route{
   string index     =1;
   string route     =2;
+  string tableName  =3;
 }
 message Routes{
   repeated Route routes =1;
@@ -210,6 +211,13 @@ service SysmonService {
     option (google.api.http) = {
       get: "/api/v1/tables"
       response_body: "response"
+    };
+  }
+  rpc AddTable(IPRequest) returns (Response) {
+    option (google.api.http) = {
+      post: "/api/v1/addtable"
+      body: "request"
+      response_body: "msg"
     };
   }
 }

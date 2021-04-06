@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -34,11 +35,12 @@ func AddIPRule(request *sysmonpb.IPRequest) string {
 	if !flag {
 
 		cmd := exec.Command("sudo", "ip", "rule", "add", "from", source_ip, "lookup", table_name)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 
 		if err != nil {
-			fmt.Println(err)
-			response = "Error"
+			response = stderr.String()
 		} else {
 			response = "Rule added"
 		}
@@ -65,10 +67,12 @@ func DelIPRule(request *sysmonpb.IPRequest) string {
 	}
 	if flag {
 		cmd := exec.Command("sudo", "ip", "rule", "del", "from", source_ip)
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
 		err := cmd.Run()
 		if err != nil {
 			fmt.Println(err)
-			response = "Error"
+			response = stderr.String()
 		} else {
 			response = "Rule deleted"
 		}
