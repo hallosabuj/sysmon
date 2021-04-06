@@ -3,6 +3,16 @@ import {
     PageSection,
     PageSectionVariants
 } from "@patternfly/react-core";
+import { 
+    Chart, 
+    ChartAxis, 
+    ChartBar, 
+    ChartGroup, 
+    ChartVoronoiContainer 
+} from '@patternfly/react-charts';
+import { 
+    Bullseye,
+ } from '@patternfly/react-core';
 
 interface DashboardPageState {
     // Empty
@@ -25,6 +35,7 @@ export class DashboardPage extends React.Component<DashboardPageProps, Dashboard
         this.periodicPing()
         //  this.doPing()
          //this.doPong()
+        //this.BasicWithRightAlignedLegend() 
     }
     componentWillUnmount(){
         if ( undefined !== this.controller) {
@@ -35,9 +46,36 @@ export class DashboardPage extends React.Component<DashboardPageProps, Dashboard
 
     render() {
         console.log('Rendering dashboard page ...')
-        return (
-            <PageSection variant={PageSectionVariants.light}> This is dashboard page</PageSection>
-        );
+        // return (
+        //     <PageSection variant={PageSectionVariants.light}> This is dashboard page</PageSection>
+        // );
+        return ( 
+             <Bullseye>
+            <div style={{ height: '250px', width: '600px' }}>
+            <Chart
+              ariaDesc="Average number of pets"
+              ariaTitle="Bar chart example"
+              containerComponent={<ChartVoronoiContainer labels={({ datum }) => `${datum.name}: ${datum.y}`} constrainToVisibleArea />}
+              domain={{y: [0,9]}}
+              domainPadding={{ x: [30, 25] }}
+              legendData={[{ name: 'Cats' }]}
+              legendOrientation="vertical"
+              legendPosition="right"
+              height={250}
+              padding={{
+                bottom: 50,
+                left: 50,
+                right: 200, // Adjusted to accommodate legend
+                top: 50
+              }}
+              width={600}
+            >
+              <ChartBar data={[{ name: 'Cats', x: '2015', y: 1 }, { name: 'Cats', x: '2016', y: 2 }, { name: 'Cats', x: '2017', y: 5 }, { name: 'Cats', x: '2018', y: 3 }]} />
+            </Chart>
+          </div>
+           </Bullseye>
+    )
+
     }
     async doPing(){
         let response=await fetch("/api/v1/ping")
@@ -72,4 +110,5 @@ export class DashboardPage extends React.Component<DashboardPageProps, Dashboard
     async periodicPing () {
         this.timerId = setInterval(() => this.dong(), 2000)
     }
+
 }
