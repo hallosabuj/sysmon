@@ -1,114 +1,110 @@
-import * as React from "react";
+import React from 'react';
 import {
-    PageSection,
-    PageSectionVariants
-} from "@patternfly/react-core";
-import { 
-    Chart, 
-    ChartAxis, 
-    ChartBar, 
-    ChartGroup, 
-    ChartVoronoiContainer 
-} from '@patternfly/react-charts';
-import { 
-    Bullseye,
- } from '@patternfly/react-core';
+  Table,
+  TableHeader,
+  TableBody,
+  sortable,
+  SortByDirection,
+  headerCol,
+  TableVariant,
+  expandable,
+  cellWidth,
+  IRowData
+} from '@patternfly/react-table';
+import {
+    Checkbox
+} from '@patternfly/react-core';
+import { type } from 'node:os';
 
-interface DashboardPageState {
+type Cell = {
+    cells : string[],
+}
+type Row = {
+    row : Cell[],
+    selected : boolean,
+}
+interface MetricsPageState {
+    // Empty
+    canSelectAll : boolean
+    columns : string[]
+    rows : Row[]
+}
+
+interface MetricsPageProps {
     // Empty
 }
 
-interface DashboardPageProps {
-    // Empty
-}
-
-export class DashboardPage extends React.Component<DashboardPageProps, DashboardPageState> {
-    controller : AbortController|undefined
-    timerId : any
-    constructor(props: DashboardPageProps) {
-        super(props);
-    }
-
-    componentDidMount(){
-        document.title = "Dashboard | SysMon"
-        this.controller = new AbortController()
-        this.periodicPing()
-        //  this.doPing()
-         //this.doPong()
-        //this.BasicWithRightAlignedLegend() 
-    }
-    componentWillUnmount(){
-        if ( undefined !== this.controller) {
-            this.controller.abort()
+export class DashboardPage extends React.Component<MetricsPageProps, MetricsPageState> {
+  constructor(props: MetricsPageProps) {
+    super(props);
+    this.state = {
+      columns: [
+        'Repositories',
+        'Branches',
+        'Pull requests',
+        'Workspaces',
+        'Last Commit'
+      ],
+      rows: [
+        {
+          row: { cells : ['one', 'two', 'a', 'four', 'five'] },
+          selected: false
+        },
+        {
+          row: { cells : ['a', 'two', 'k', 'four', 'five'] },
+          selected: false
+        },
+        {
+          row: { cells :['p', 'two', 'b', 'four', 'five'] },
+          selected: false
         }
-        clearInterval(this.timerId)
-    }
+      ],
+      canSelectAll: true
+    };
+    this.onSelect = this.onSelect.bind(this);
+    this.toggleSelect = this.toggleSelect.bind(this);
+  }
 
-    render() {
-        console.log('Rendering dashboard page ...')
-        // return (
-        //     <PageSection variant={PageSectionVariants.light}> This is dashboard page</PageSection>
-        // );
-        return ( 
-             <Bullseye>
-            <div style={{ height: '250px', width: '600px' }}>
-            <Chart
-              ariaDesc="Average number of pets"
-              ariaTitle="Bar chart example"
-              containerComponent={<ChartVoronoiContainer labels={({ datum }) => `${datum.name}: ${datum.y}`} constrainToVisibleArea />}
-              domain={{y: [0,9]}}
-              domainPadding={{ x: [30, 25] }}
-              legendData={[{ name: 'Cats' }]}
-              legendOrientation="vertical"
-              legendPosition="right"
-              height={250}
-              padding={{
-                bottom: 50,
-                left: 50,
-                right: 200, // Adjusted to accommodate legend
-                top: 50
-              }}
-              width={600}
-            >
-              <ChartBar data={[{ name: 'Cats', x: '2015', y: 1 }, { name: 'Cats', x: '2016', y: 2 }, { name: 'Cats', x: '2017', y: 5 }, { name: 'Cats', x: '2018', y: 3 }]} />
-            </Chart>
-          </div>
-           </Bullseye>
-    )
+  onSelect(event: React.FormEvent<HTMLInputElement>, isSelected: boolean, rowId: number, oneRow: IRowData ) {
+    let rows;
+    if (rowId === -1) {
+      rows = this.state.rows.map(oneRow => {
+        oneRow.selected = isSelected;
+        return oneRow;
+      });
+    } else {
+      rows = [...this.state.rows];
+      rows[rowId].selected = isSelected;
+    }
+    this.setState({
+      rows
+    });
+  }
 
-    }
-    async doPing(){
-        let response=await fetch("/api/v1/ping")
-        console.log(response.status)
-        let body=await response.text()
-        console.log(body)
-    }
-    async doPong(){
-        let response=await fetch("/api/v1/pong",{
-            method:"post",
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                name:"sabuj",
-                age:111
-            })
-        })
-        console.log(response.status)
-        let body=await response.text()
-        console.log(body)
-    }
-    async dong () {
-        let request = await fetch ("/api/v1/dong/"+"hello-world",{signal:this.controller!.signal})
-        if ( request.status === 200 ) {
-            console.log("request.status ",request.status)
-            let body = await request.text()
-            console.log("Body ",body)
-        } 
-        else {
-            console.log(request.status)
-        }
-    }
-    async periodicPing () {
-        this.timerId = setInterval(() => this.dong(), 2000)
-    }
+  toggleSelect(checked: boolean) {
+    this.setState({
+      canSelectAll: checked
+    });
+  }
 
+  render() {
+    const { columns, rows } = this.state;
+
+    return (
+      <div>
+      <Table aria-label="Selectable Table" onSelect={this.onSelect} cells={columns} rows={rows} canSelectAll={this.state.canSelectAll}>
+        <TableHeader />
+        <TableBody />
+      </Table>
+      <Checkbox
+        label="canSelectAll"
+        isChecked={this.state.canSelectAll}
+        onChange={this.toggleSelect}
+        aria-label="toggle select all checkbox"
+        id="toggle-select-all"
+        name="toggle-select-all"
+      />
+      </div>
+    );
+  }
 }
