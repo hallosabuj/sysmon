@@ -105,8 +105,8 @@ export class Tables implements ITables {
 }
 //================================================
 export interface IInterface {
-    index: string | undefined
-    name: string | undefined
+    index: string
+    name: string
 }
 
 export interface IInterfaces {
@@ -114,8 +114,12 @@ export interface IInterfaces {
 }
 
 export class Interface implements IInterface {
-    index: string | undefined
-    name: string | undefined
+    index: string 
+    name: string 
+    constructor(){
+        this.index=""
+        this.name=""
+    }
 }
 
 export class Interfaces implements IInterfaces {
