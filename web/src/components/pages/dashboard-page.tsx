@@ -16,11 +16,8 @@ import {
 } from '@patternfly/react-core';
 import { type } from 'node:os';
 
-type Cell = {
-    cells : string[],
-}
 type Row = {
-    row : Cell[],
+    row : string[],
     selected : boolean,
 }
 interface MetricsPageState {
@@ -47,15 +44,15 @@ export class DashboardPage extends React.Component<MetricsPageProps, MetricsPage
       ],
       rows: [
         {
-          row: { cells : ['one', 'two', 'a', 'four', 'five'] },
+          row:  ['one', 'two', 'a', 'four', 'five'] ,
           selected: false
         },
         {
-          row: { cells : ['a', 'two', 'k', 'four', 'five'] },
+          row:  ['a', 'two', 'k', 'four', 'five'] ,
           selected: false
         },
         {
-          row: { cells :['p', 'two', 'b', 'four', 'five'] },
+          row: ['p', 'two', 'b', 'four', 'five'] ,
           selected: false
         }
       ],
@@ -67,18 +64,18 @@ export class DashboardPage extends React.Component<MetricsPageProps, MetricsPage
 
   onSelect(event: React.FormEvent<HTMLInputElement>, isSelected: boolean, rowId: number, oneRow: IRowData ) {
     let rows;
-    if (rowId === -1) {
-      rows = this.state.rows.map(oneRow => {
-        oneRow.selected = isSelected;
-        return oneRow;
-      });
-    } else {
-      rows = [...this.state.rows];
-      rows[rowId].selected = isSelected;
-    }
-    this.setState({
-      rows
-    });
+    // if (rowId === -1) {
+    //   rows = this.state.rows.map(oneRow => {
+    //     oneRow.selected = isSelected;
+    //     return oneRow;
+    //   });
+    // } else {
+    //   rows = [...this.state.rows];
+    //   rows[rowId].selected = isSelected;
+    // }
+    // this.setState({
+    //   rows
+    // });
   }
 
   toggleSelect(checked: boolean) {
@@ -92,7 +89,7 @@ export class DashboardPage extends React.Component<MetricsPageProps, MetricsPage
 
     return (
       <div>
-      <Table aria-label="Selectable Table" onSelect={this.onSelect} cells={columns} rows={rows} canSelectAll={this.state.canSelectAll}>
+      {/* <Table aria-label="Selectable Table" onSelect={this.onSelect} cells={columns} rows={rows} canSelectAll={this.state.canSelectAll}>
         <TableHeader />
         <TableBody />
       </Table>
@@ -102,8 +99,9 @@ export class DashboardPage extends React.Component<MetricsPageProps, MetricsPage
         onChange={this.toggleSelect}
         aria-label="toggle select all checkbox"
         id="toggle-select-all"
-        name="toggle-select-all"
-      />
+        name="toggle-select-all" */}
+      {/* /> */}
+      Dashboard Page
       </div>
     );
   }

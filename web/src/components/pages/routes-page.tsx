@@ -26,11 +26,18 @@ import {
     Form,
     FormGroup,
     ActionGroup,
-    TextInput, 
+    TextInput,
+    FormSelect,
+    FormSelectOption, 
 } from '@patternfly/react-core';
 import { MinusIcon, PlusCircleIcon, PlusIcon, RedoIcon, TrashIcon } from '@patternfly/react-icons';
+import { c_background_image_BackgroundColor } from "@patternfly/react-tokens";
 
-
+type Option={
+    value:string
+    label:string
+    disabled:boolean
+}
 interface RoutesPageState {
     isModalOpen : boolean
     canSelectAll : boolean
@@ -46,6 +53,8 @@ interface RoutesPageState {
     dstIP : string
     defaultGateway : string
     interfaceName : string
+    isDisabledConfirm:boolean
+    options:Option[]
 }
 
 interface RoutesPageProps {
@@ -71,7 +80,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 		    columns : ['Identifier', 'Name'],
 		    rows : [],
             interfaces_columns:['Index','Interface Name'],
-            interfaces_rows:[]
+            interfaces_rows:[],
+            isDisabledConfirm:true,
+            options : []
 		  };
 
 		    //this.onSelect = this.onSelect.bind(this);
@@ -79,6 +90,12 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             this.handleModalToggle = this.handleModalToggle.bind(this);
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
+            this.updateRules = this.updateRules.bind(this);
+            this.updateRoute = this.updateRoute.bind(this);
+            this.updateTables = this.updateTables.bind(this);
+            this.updateInterfaces = this.updateInterfaces.bind(this);
+            this.onChange = this.onChange.bind(this);
+            this.checkAllValue = this.checkAllValue.bind(this);
     }
 
     async routes() :Promise<Routes> {
@@ -167,8 +184,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             body: JSON.stringify(payload)
         })).json()
         let temp:GeneralResponse=response
-        console.log(response)
+        console.log("===============")
         console.log(temp)
+        console.log("===============")
     }
     //==============================================
 
@@ -215,12 +233,15 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         let response=await this.interfaces()
         if (response.interfaces){
             let interfaces:string[][]
+            let temp:Option[]=[{value:"null",label:"Choose Interface",disabled:false}]
             interfaces=[]
             for(let i=0;i<response.interfaces?.length;i++){
+                temp=[...temp,{value:response.interfaces[i].name,label:response.interfaces[i].name,disabled:false}]
                 interfaces=[...interfaces,[response.interfaces[i].index,response.interfaces[i].name]]
             }
             this.setState({
-                interfaces_rows:interfaces
+                interfaces_rows:interfaces,
+                options:temp
             })
         }
     }
@@ -254,30 +275,9 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         this.setState(({ isModalOpen }) => ({
           isModalOpen: !isModalOpen
         }));
-      }
-    // handleModalInput () {
-    //     console.log(this.state.value)
-    //     // let temp=document.getElementById("name").
-
-    //     this.setState(prev => ({
-    //         value: "dd"
-    //       }))
-    //       console.log(this.state.value)
-
-    //     // this.setState (({ value, isModalOpen }) => ({
-    //     //     value: value,
-    //     //     isModalOpen: !isModalOpen
-    //     // }), () => {console.log(this.state.value," ",this.state.isModalOpen," ",this.state.value)});
-    //   }  
+    } 
       
     onSelect(event : React.FormEvent<HTMLInputElement>, isSelected : boolean, rowIndex : number,rowData: IRowData,extraData: IExtraData) {
-		// let rows = this.state.rows_rule.map((oneRow, index) => {
-		// 	oneRow.selected = rowId === index;
-		// 	return oneRow;
-		//   });
-		//   this.setState({
-		// 	rows
-		//   });
         console.log(rowIndex)
         isSelected=true
 	}
@@ -287,32 +287,41 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 		  canSelectAll: checked
 		});
 	} 
-    handleChange(value: string, event: React.FormEvent<HTMLInputElement>) {
+    async handleChange(value: string, event: React.FormEvent<HTMLInputElement>) {
         const id = event.currentTarget.id;
         const newValue = event.currentTarget.value;
         if (id == "simple-form-src-ip-01") {
-            console.log("interface ",newValue)
-            this.setState({
+            await this.setState({
               srcIP :newValue
             });
         }
         if (id == "simple-form-dst-ip-01") {
-            console.log("interface ",newValue)
-            this.setState({
+            await this.setState({
               dstIP :newValue
             });
         }
         if (id == "simple-form-gateway-01") {
-            console.log("interface ",newValue)
-            this.setState({
+            await this.setState({
               defaultGateway :newValue
             });
         }
-        if (id == "simple-form-interface-01") {
-            console.log("interface ",newValue)
+        this.checkAllValue()
+    }
+    checkAllValue(){
+        if (this.state.interfaceName!="null"){
+            if (this.state.srcIP.length>0 && this.state.dstIP.length>0 && this.state.defaultGateway.length>0 && this.state.interfaceName.length>0){
+                this.setState({
+                    isDisabledConfirm:false
+                })
+            }else{
+                this.setState({
+                    isDisabledConfirm:true
+                })
+            }
+        }else{
             this.setState({
-              interfaceName :newValue
-            });
+                isDisabledConfirm:true
+            })
         }
     }         
     handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
@@ -321,6 +330,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         payload5.intermediate=this.state.defaultGateway;
         payload5.interfaceName=this.state.interfaceName;
         payload5.sourceIp=this.state.srcIP;
+
         this.addTable(payload5)
         this.updateTables()
         this.updateRoute()
@@ -335,6 +345,13 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         });
         event.preventDefault();
     }
+
+    async onChange(value: string, event: React.FormEvent<HTMLSelectElement>){
+        await this.setState({
+            interfaceName:value
+        })
+        this.checkAllValue()
+    }
     render() {
         console.log('Rendering routes page ...')
         const { srcIP, dstIP, defaultGateway, interfaceName, isModalOpen, canSelectAll, columns_route, columns_rule, columns, rows_route, rows_rule, rows,interfaces_rows,interfaces_columns } = this.state;
@@ -345,47 +362,11 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
                     <PageSection variant={PageSectionVariants.light}>
                         <Card>
                             <CardHeader>
-                                <CardTitle>Rules Information</CardTitle>
-                                <CardActions>
-                                    <Button variant="link" icon={<RedoIcon />}>
-                                    </Button>
-                                    <Button variant="link" icon={<TrashIcon />}>
-                                    </Button>
-                                </CardActions>
-                            </CardHeader>
-                            <CardBody>
-                                <Checkbox
-                                label="Can select all"
-                                className="pf-u-mb-lg"
-                                isChecked={canSelectAll}
-                                onChange={this.toggleSelect}
-                                aria-label="toggle select all checkbox"
-                                id="toggle-select-all"
-                                name="toggle-select-all"
-                                />
-                                <Table
-                                onSelect={this.onSelect}
-                                //selectVariant={RowSelectVariant.radio}
-                                aria-label="Selectable Table"
-                                cells={columns_rule}
-                                rows={rows_rule}>
-                                <TableHeader />
-                                <TableBody />
-                                </Table>
-                            </CardBody>
-                        </Card>
-                    </PageSection>	
-                        
-                    <PageSection variant={PageSectionVariants.light}>
-                        <Card>
-                            <CardHeader>
                                 <CardTitle>Routes Information</CardTitle>
                                 <CardActions>
                                     <Button variant="link" icon={<PlusIcon />} onClick={this.handleModalToggle}>
                                     </Button>
-                                    <Button variant="link" icon={<RedoIcon />}>
-                                    </Button>
-                                    <Button variant="link" icon={<TrashIcon />}>
+                                    <Button variant="link" icon={<RedoIcon />} onClick={this.updateRoute}>
                                     </Button>
                                 </CardActions>
                             </CardHeader>
@@ -400,15 +381,34 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
                             </CardBody>
                         </Card>
                     </PageSection>
+
+                    <PageSection variant={PageSectionVariants.light}>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Rules Information</CardTitle>
+                                <CardActions>
+                                    <Button variant="link" icon={<RedoIcon />} onClick={this.updateRules}>
+                                    </Button>
+                                </CardActions>
+                            </CardHeader>
+                            <CardBody>
+                                <Table
+                                aria-label="Selectable Table"
+                                cells={columns_rule}
+                                rows={rows_rule}>
+                                <TableHeader />
+                                <TableBody />
+                                </Table>
+                            </CardBody>
+                        </Card>
+                    </PageSection>	
                         
                     <PageSection variant={PageSectionVariants.light}>
                         <Card>
                             <CardHeader>
                                 <CardTitle>IP Tables</CardTitle>
                                 <CardActions>
-                                    <Button variant="link" icon={<RedoIcon />}>
-                                    </Button>
-                                    <Button variant="link" icon={<TrashIcon />}>
+                                    <Button variant="link" icon={<RedoIcon />} onClick={this.updateTables}>
                                     </Button>
                                 </CardActions>
                             </CardHeader>
@@ -429,9 +429,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
                             <CardHeader>
                                 <CardTitle>Interfaces List</CardTitle>
                                 <CardActions>
-                                    <Button variant="link" icon={<RedoIcon />}>
-                                    </Button>
-                                    <Button variant="link" icon={<TrashIcon />}>
+                                    <Button variant="link" icon={<RedoIcon />} onClick={this.updateInterfaces}>
                                     </Button>
                                 </CardActions>
                             </CardHeader>
@@ -448,7 +446,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
                     </PageSection>        
                 </Stack>
                 <Modal
-                    title="Simple modal header"
+                    title="Add new routing policy"
                     isOpen={isModalOpen}
                     onClose={this.handleModalToggle}
                 >
@@ -487,19 +485,24 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
                                 onChange={this.handleChange}
                             />
                         </FormGroup>
-                        <FormGroup label="Interface Name" isRequired fieldId="simple-form-interface-01">
-                            <TextInput
-                                isRequired
-                                type="tel"
-                                id="simple-form-interface-01"
-                                name="simple-form-interface-01"
+
+                        <FormGroup label="Interface Name" fieldId="horizontal-form-title">
+                            <FormSelect
                                 value={this.state.interfaceName}
-                                onChange={this.handleChange}
-                            />
+                                onChange={this.onChange}
+                                id="horzontal-form-title"
+                                name="horizontal-form-title"
+                                aria-label="Your title"
+                            >
+                                {this.state.options.map((option, index) => (
+                                <FormSelectOption isDisabled={option.disabled} key={index} value={option.value} label={option.label} />
+                                ))}
+                            </FormSelect>
                         </FormGroup>
+
                         <ActionGroup>
-                            <Button key="confirm" variant="primary" onClick={this.handleSubmit}>
-                                Confirm</Button>,
+                            <Button key="confirm" variant="primary" onClick={this.handleSubmit} isDisabled={this.state.isDisabledConfirm}>
+                                Confirm</Button>
                             <Button key="cancel" variant="link" onClick={this.handleModalToggle}>
                                 Cancel</Button>
                         </ActionGroup>

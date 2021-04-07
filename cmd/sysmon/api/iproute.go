@@ -32,7 +32,7 @@ func AddIPRoute(request *sysmonpb.IPRequest) string {
 	}
 
 	if !flag {
-		cmd := exec.Command("sudo", "ip", "route", "add", destination, "via", intermediate, "dev", net_interface, "table", table_name)
+		cmd := exec.Command("ip", "route", "add", destination, "via", intermediate, "dev", net_interface, "table", table_name)
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		err := cmd.Run()
@@ -66,7 +66,7 @@ func DelIPRoute(request *sysmonpb.IPRequest) string {
 	}
 
 	if flag {
-		cmd := exec.Command("sudo", "ip", "route", "del", destination, "table", table_name)
+		cmd := exec.Command("ip", "route", "del", destination, "table", table_name)
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		err := cmd.Run()

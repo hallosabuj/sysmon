@@ -34,7 +34,7 @@ func AddIPRule(request *sysmonpb.IPRequest) string {
 	}
 	if !flag {
 
-		cmd := exec.Command("sudo", "ip", "rule", "add", "from", source_ip, "lookup", table_name)
+		cmd := exec.Command("ip", "rule", "add", "from", source_ip, "lookup", table_name)
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		err := cmd.Run()
@@ -66,7 +66,7 @@ func DelIPRule(request *sysmonpb.IPRequest) string {
 		}
 	}
 	if flag {
-		cmd := exec.Command("sudo", "ip", "rule", "del", "from", source_ip)
+		cmd := exec.Command("ip", "rule", "del", "from", source_ip)
 		var stderr bytes.Buffer
 		cmd.Stderr = &stderr
 		err := cmd.Run()

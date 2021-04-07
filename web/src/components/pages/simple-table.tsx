@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { HtmlHTMLAttributes } from 'react';
 import { 
 	Table, 
 	TableHeader, 
@@ -25,13 +25,18 @@ import { MinusIcon, PlusCircleIcon, PlusIcon, RedoIcon, TrashIcon } from '@patte
 import { GeneralRequest } from '../../models/route-models';
 import { request } from 'node:http';
 
+type Cell={
+	cells:string[]
+}
+type Action={
+	title:string
+	onClick:(event:any, rowId:any, rowData:any, extra:any)=>void
+}
 
 interface TablePageStates {
-	canSelectAll : boolean
-	columns_route : string[]
-	rows_route : string[][]
-    isModalOpen:boolean
-    request:GeneralRequest
+	columns : string[]
+	rows : Cell[]
+	actions:Action[]
 }
 
 interface TablePageProps {
@@ -44,41 +49,34 @@ export class STable extends React.Component<TablePageProps, TablePageStates> {
     constructor(props : TablePageProps) {
 		super(props);
 	    this.state = {
-			canSelectAll: true,
-			columns_route : ['Index', 'Route'],
-		    rows_route : [
-			    ['Repository one', 'Branch one'],
-			    ['Repository two', 'Branch two'],
-			    ['Repository three', 'Branch three']
-		    ],
-            isModalOpen:false,
-            request:new GeneralRequest
+			columns: [
+				'Repositories',
+				'Branches',
+				'Pull requests',
+				'Workspaces',
+				'Last Commit'
+			  ],
+			  rows: [
+				{
+				  cells: ['<h1>ggg</h1>', 'two', 'a', 'four', 'five']
+				},
+				{
+				  cells: ['a', 'two', 'k', 'four', 'five']
+				},
+				{
+				  cells: ['p', 'two', 'b', 'four', 'five'],
+				}
+			  ],
+			  actions: [
+				{
+				  title: 'Remove',
+				  onClick:(event, rowId, rowData, extra) => {console.log('clicked on Some action, on row: ', rowId)}
+				}
+			  ]
 		};
-        this.handleClick = this.handleClick.bind(this);
-        this.handleChange = this.handleChange.bind(this);
 	}
-	  
-        handleModalToggle = () => {
-            this.setState(({ isModalOpen }) => ({
-              isModalOpen: !isModalOpen
-            }));
-        };
-        handleChange(event: React.FormEvent<HTMLInputElement>) {
-            const newValue = event.currentTarget.value;
-            console.log(newValue)
-            let temp=new GeneralRequest()
-            temp.destination=newValue
-            this.setState({
-                request:temp
-            })
-        }
-        handleClick(event: React.MouseEvent<HTMLButtonElement,MouseEvent>) {
-            console.log("==========")
-            console.log(this.state.request)
-            event.preventDefault()
-        }
 		render() {
-		  const { canSelectAll, columns_route,  rows_route,isModalOpen,request } = this.state;
+		  const { columns,  rows,actions } = this.state;
 	  
 		  return ( 			
 		 <Stack>
@@ -95,36 +93,16 @@ export class STable extends React.Component<TablePageProps, TablePageStates> {
 					</CardHeader>
 					<CardBody>
 						<Table
+						actions={actions}
 						aria-label="Selectable Table"
-						cells={columns_route}
-						rows={rows_route}>
+						cells={columns}
+						rows={rows}>
 						    <TableHeader />
 						    <TableBody />
 						</Table>
 					</CardBody>
 				</Card>
                 <React.Fragment>
-                    <Button variant="primary" onClick={this.handleModalToggle}>
-                        Show Modal
-                    </Button>
-                    <Modal
-                        title="Modal Header"
-                        isOpen={isModalOpen}
-                        onClose={this.handleModalToggle}
-                        actions={[
-                            <Button key="confirm" variant="primary" onClick={this.handleModalToggle}>
-                            Confirm
-                            </Button>,
-                            <Button key="cancel" variant="link" onClick={this.handleModalToggle}>
-                            Cancel
-                            </Button>
-                        ]}
-                    >
-                        <form id="form">
-                            <input name="dd" id="dd" value={request.destination} onChange={this.handleChange}></input>
-                            <button onClick={this.handleClick}>Submit</button>
-                        </form>
-                    </Modal>
                 </React.Fragment>
 			</PageSection>		
 		</Stack>

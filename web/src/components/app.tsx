@@ -55,22 +55,7 @@ export class App extends React.Component<AppProps, AppState> {
             <Nav theme="dark">
                 <NavList>
                     <NavItem>
-                        <NavLink exact to='/web/dashboard' activeClassName="pf-m-current">Dashboard</NavLink>
-                    </NavItem>
-                    <NavItem>
                         <NavLink exact to='/web/routes' activeClassName="pf-m-current">Routes</NavLink>
-                    </NavItem>
-                    <NavItem>
-                        <NavLink exact to='/web/metrics' activeClassName="pf-m-current">Metrics</NavLink>
-                    </NavItem>
-                    <NavItem>
-                        <NavLink exact to='/web/sample' activeClassName="pf-m-current">Sample</NavLink>
-                    </NavItem>
-                    <NavItem>
-                        <NavLink exact to='/web/table' activeClassName="pf-m-current">Table</NavLink>
-                    </NavItem>
-                    <NavItem>
-                        <NavLink exact to='/web/stable' activeClassName="pf-m-current">Simple Table</NavLink>
                     </NavItem>
                 </NavList>
             </Nav>
@@ -101,7 +86,7 @@ export class App extends React.Component<AppProps, AppState> {
                             <STable></STable>
                         </Route>
                         <Route exact path='/'>
-                            <Redirect to='/web/dashboard'> </Redirect>
+                            <Redirect to='/web/routes'> </Redirect>
                         </Route>
                     </Switch>
                 </Page>

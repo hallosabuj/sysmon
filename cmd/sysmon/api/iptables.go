@@ -74,10 +74,14 @@ func FindInArray(array []int, element int) bool {
 
 func AddTable(request *sysmonpb.IPRequest) string {
 	var interfaceName string = request.Request.InterfaceName
-	var ip string = request.Request.SourceIp
-	ipNumber, _ := Ip2long(ip)
-	ip = int32ToString(ipNumber)
+	var ip string = strings.Split(request.Request.SourceIp, "/")[0]
+	ipNumber, err := Ip2long(ip)
 	var response string
+	if err != nil {
+		response = err.Error()
+		return response
+	}
+	ip = int32ToString(ipNumber)
 	//Check whether table exist or not
 	tables := Tables()
 	var tableNumber []int
@@ -85,7 +89,7 @@ func AddTable(request *sysmonpb.IPRequest) string {
 	for i := range tables {
 		temp, _ := strconv.Atoi(strings.Fields(tables[i])[0])
 		tableNumber = append(tableNumber, temp)
-		if strings.Contains(strings.Fields(tables[i])[1], ip) {
+		if strings.Contains(strings.Fields(tables[i])[1], interfaceName+"_"+ip) {
 			tableExists = true
 			break
 		}
@@ -110,11 +114,15 @@ func AddTable(request *sysmonpb.IPRequest) string {
 		//Now write to rt_tables
 		file, err := os.OpenFile("/etc/iproute2/rt_tables", os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
-			fmt.Println(err)
+			// fmt.Println(err)
+			response = err.Error()
+			return response
 		}
 		defer file.Close()
 		if _, err := file.WriteString(lineToAdd); err != nil {
-			fmt.Println(err)
+			// fmt.Println(err)
+			response = err.Error()
+			return response
 		}
 		response = "Table added..."
 		request.Request.TableName = newTableName

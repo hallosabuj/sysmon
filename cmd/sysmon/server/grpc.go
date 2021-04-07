@@ -43,7 +43,7 @@ func (s *GRPCServer) Dong(ctxt context.Context, request *sysmonpb.DongReq) (*sys
 }
 
 func (s *GRPCServer) AddRule(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.IPResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.AddIPRule(request)
 	response := &sysmonpb.IPResponse{
 		Response: &sysmonpb.Response{Msg: msg},
@@ -52,7 +52,7 @@ func (s *GRPCServer) AddRule(ctxt context.Context, request *sysmonpb.IPRequest) 
 }
 
 func (s *GRPCServer) DelRule(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.IPResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.DelIPRule(request)
 	response := &sysmonpb.IPResponse{
 		Response: &sysmonpb.Response{Msg: msg},
@@ -61,7 +61,7 @@ func (s *GRPCServer) DelRule(ctxt context.Context, request *sysmonpb.IPRequest) 
 }
 
 func (s *GRPCServer) AddRoute(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.IPResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.AddIPRoute(request)
 	response := &sysmonpb.IPResponse{
 		Response: &sysmonpb.Response{Msg: msg},
@@ -70,7 +70,7 @@ func (s *GRPCServer) AddRoute(ctxt context.Context, request *sysmonpb.IPRequest)
 }
 
 func (s *GRPCServer) DelRoute(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.IPResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.DelIPRoute(request)
 	response := &sysmonpb.IPResponse{
 		Response: &sysmonpb.Response{Msg: msg},
@@ -79,7 +79,7 @@ func (s *GRPCServer) DelRoute(ctxt context.Context, request *sysmonpb.IPRequest)
 }
 
 func (s *GRPCServer) Rules(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.RuleRespone, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.IPRules()
 	var temp []*sysmonpb.Rule
 	for i := range msg {
@@ -94,7 +94,7 @@ func (s *GRPCServer) Rules(ctxt context.Context, request *sysmonpb.IPRequest) (*
 }
 
 func (s *GRPCServer) Routes(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.RouteRespone, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.IPRoutes()
 	var temp []*sysmonpb.Route
 	for i := range msg {
@@ -107,7 +107,7 @@ func (s *GRPCServer) Routes(ctxt context.Context, request *sysmonpb.IPRequest) (
 	return response, nil
 }
 func (s *GRPCServer) RoutesByTableName(ctxt context.Context, request *sysmonpb.Request) (*sysmonpb.RouteRespone, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.IPRoutesByTableName(request)
 	var temp []*sysmonpb.Route
 	for i := range msg {
@@ -121,7 +121,7 @@ func (s *GRPCServer) RoutesByTableName(ctxt context.Context, request *sysmonpb.R
 }
 
 func (s *GRPCServer) InterfaceAddresses(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.InterfaceAddressesResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.InterfaceAddresses()
 	var temp []*sysmonpb.IpAddress
 	for i := range msg {
@@ -136,7 +136,7 @@ func (s *GRPCServer) InterfaceAddresses(ctxt context.Context, request *sysmonpb.
 }
 
 func (s *GRPCServer) Interfaces(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.InterfacesResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.Interfaces()
 	var temp []*sysmonpb.Interface
 	for i := range msg {
@@ -151,7 +151,7 @@ func (s *GRPCServer) Interfaces(ctxt context.Context, request *sysmonpb.IPReques
 }
 
 func (s *GRPCServer) InterfaceDetailsByName(ctxt context.Context, request *sysmonpb.Request) (*sysmonpb.InterfaceDetailsResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.InterfaceDetailsByName(request)
 	var normalAddress []*sysmonpb.IpAddress
 	for i := range msg.NormalAddress {
@@ -175,7 +175,7 @@ func (s *GRPCServer) InterfaceDetailsByName(ctxt context.Context, request *sysmo
 }
 
 func (s *GRPCServer) IpTables(ctxt context.Context, request *sysmonpb.Request) (*sysmonpb.IPTablesResponse, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.Tables()
 	var temp []*sysmonpb.IPTable
 	for i := range msg {
@@ -189,7 +189,7 @@ func (s *GRPCServer) IpTables(ctxt context.Context, request *sysmonpb.Request) (
 }
 
 func (s *GRPCServer) AddTable(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.Response, error) {
-	api.MakeSudo()
+	// api.MakeSudo()
 	msg := api.AddTable(request)
 	response := &sysmonpb.Response{
 		Msg: msg,
