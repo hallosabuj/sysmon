@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InterfaceAddresses, InterfaceDetails, Interfaces,ITables, Routes,Route,IRules, Rules, Tables,GeneralRequest,GeneralResponse, Rule, IInterfaces } from "../../models/route-models";
+import { InterfaceAddresses, InterfaceDetails, Interfaces,ITables, Routes,Route,IRules, Rules, Tables,GeneralRequest,GeneralResponse, Rule, IInterfaces, IAllocatedIPs } from "../../models/route-models";
 import { 
 	Table, 
 	TableHeader, 
@@ -49,6 +49,8 @@ interface RoutesPageState {
 	rows : string[][]
     interfaces_columns:string[]
     interfaces_rows:string[][]
+    dhcp_columns:string[]
+    dhcp_rows:string[][]
     srcIP : string
     dstIP : string
     defaultGateway : string
@@ -81,6 +83,12 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
 		    rows : [],
             interfaces_columns:['Index','Interface Name'],
             interfaces_rows:[],
+            dhcp_columns:['Index','IP','Subnet Mask'],
+            dhcp_rows:[
+                ['1','10.10.1.100','255.255.255.0'],
+                ['2','10.10.1.101','255.255.255.0'],
+                ['3','10.10.1.102','255.255.255.0']
+            ],
             isDisabledConfirm:true,
             options : []
 		  };
@@ -94,6 +102,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             this.updateRoute = this.updateRoute.bind(this);
             this.updateTables = this.updateTables.bind(this);
             this.updateInterfaces = this.updateInterfaces.bind(this);
+            this.updateDHCP = this.updateDHCP.bind(this);
             this.onChange = this.onChange.bind(this);
             this.checkAllValue = this.checkAllValue.bind(this);
     }
@@ -189,6 +198,12 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         console.log("===============")
     }
     //==============================================
+    async getAllocatedIp():Promise<IAllocatedIPs>{
+        let response=await (await fetch("/api/v1/allocatedip")).json()
+        let temp:IAllocatedIPs=response
+        return temp
+    }
+    //=================================================
 
     async updateRoute(){
         let response=await this.routes()
@@ -245,6 +260,19 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
             })
         }
     }
+    async updateDHCP(){
+        let response=await this.getAllocatedIp()
+        if (response.ips){
+            let dhcp_rows:string[][]
+            dhcp_rows=[]
+            for(let i=0;i<response.ips?.length;i++){
+                dhcp_rows=[...dhcp_rows,[String(i+1),response.ips[i].ip,response.ips[i].subnetMask]]
+            }
+            this.setState({
+                dhcp_rows:dhcp_rows
+            })
+        }
+    }
 
     componentDidMount(){
         document.title = "Routes | SysMon"
@@ -252,6 +280,7 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         this.updateRules()
         this.updateTables()
         this.updateInterfaces()
+        this.updateDHCP()
         // For delrule
         const payload2=new GeneralRequest()
         payload2.destination="192.168.56.11";
@@ -269,19 +298,16 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         // const interfaceName="wlp2s0"
         // this.interfaceByName(interfaceName)
         //==================================
-    }
-    
+    }    
     handleModalToggle () {
         this.setState(({ isModalOpen }) => ({
           isModalOpen: !isModalOpen
         }));
-    } 
-      
+    }   
     onSelect(event : React.FormEvent<HTMLInputElement>, isSelected : boolean, rowIndex : number,rowData: IRowData,extraData: IExtraData) {
         console.log(rowIndex)
         isSelected=true
 	}
-
 	toggleSelect(checked : boolean) {
 		this.setState({
 		  canSelectAll: checked
@@ -345,16 +371,21 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
         });
         event.preventDefault();
     }
-
     async onChange(value: string, event: React.FormEvent<HTMLSelectElement>){
         await this.setState({
             interfaceName:value
         })
         this.checkAllValue()
     }
+    
     render() {
         console.log('Rendering routes page ...')
-        const { srcIP, dstIP, defaultGateway, interfaceName, isModalOpen, canSelectAll, columns_route, columns_rule, columns, rows_route, rows_rule, rows,interfaces_rows,interfaces_columns } = this.state;
+        const { 
+            srcIP, dstIP, defaultGateway, interfaceName, 
+            isModalOpen, canSelectAll, columns_route, columns_rule, 
+            columns, rows_route, rows_rule, rows,interfaces_rows,
+            interfaces_columns,dhcp_columns,dhcp_rows 
+        } = this.state;
 	  
 		return ( 	
             <div>    		
@@ -443,7 +474,29 @@ export class RoutesPage extends React.Component<RoutesPageProps, RoutesPageState
                                 </Table>
                             </CardBody>
                         </Card>
-                    </PageSection>        
+                    </PageSection>  
+
+                     <PageSection variant={PageSectionVariants.light}>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Allocated IP</CardTitle>
+                                <CardActions>
+                                    <Button variant="link" icon={<RedoIcon />} onClick={this.updateDHCP}>
+                                    </Button>
+                                </CardActions>
+                            </CardHeader>
+                            <CardBody>
+                            <Table
+                                aria-label="Selectable Table"
+                                cells={dhcp_columns}
+                                rows={dhcp_rows}>
+                                <TableHeader />
+                                <TableBody />
+                                </Table>
+                            </CardBody>
+                        </Card>
+                    </PageSection>  
+                          
                 </Stack>
                 <Modal
                     title="Add new routing policy"

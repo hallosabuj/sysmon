@@ -186,3 +186,32 @@ export interface IResponse{
 export class GeneralResponse implements IResponse{
     msg:string | undefined;
 }
+//======================================================
+export interface IAllocatedIP {
+    ip: string
+    subnetMask: string
+    index:string
+}
+
+export interface IAllocatedIPs {
+    ips: Array<IAllocatedIP> | undefined
+}
+
+export class AllocatedIP implements IAllocatedIP {
+    ip: string 
+    index:string
+    subnetMask: string 
+    constructor(){
+        this.ip=""
+        this.subnetMask=""
+        this.index=""
+    }
+}
+
+export class AllocatedIPs implements IAllocatedIPs {
+    ips: Array<AllocatedIP> | undefined
+
+    constructor(arg: Optional<IInterfaces>) {
+        this.ips = undefined
+    }
+}

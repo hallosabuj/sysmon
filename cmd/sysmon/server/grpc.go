@@ -196,3 +196,17 @@ func (s *GRPCServer) AddTable(ctxt context.Context, request *sysmonpb.IPRequest)
 	}
 	return response, nil
 }
+
+func (s *GRPCServer) ListAllocatedIp(ctxt context.Context, request *sysmonpb.IPRequest) (*sysmonpb.AllocatedIPsResponse, error) {
+	// api.MakeSudo()
+	msg := api.GetAllocatedIP()
+	var temp []*sysmonpb.AllocatedIP
+	for i := range msg {
+		temp = append(temp, &sysmonpb.AllocatedIP{Ip: msg[i].IP, SubnetMask: msg[i].SubnetMask})
+	}
+	result := &sysmonpb.AllocatedIPs{Ips: temp}
+	response := &sysmonpb.AllocatedIPsResponse{
+		Response: result,
+	}
+	return response, nil
+}

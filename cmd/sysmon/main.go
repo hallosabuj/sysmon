@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"sysmon/cmd/sysmon/api"
 	"sysmon/cmd/sysmon/server"
 )
 
@@ -22,6 +23,8 @@ func main() {
 
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
+	// go api.Test()
+	go api.DhcpSnooping()
 	go func() {
 		<-signals
 		done <- true

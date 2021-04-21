@@ -288,7 +288,7 @@ func Build() {
 	)
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, strings.Join([]string{"GOARCH", "amd64"}, "="))
-	cmd.Env = append(cmd.Env, strings.Join([]string{"CGO_ENABLED", "0"}, "="))
+	cmd.Env = append(cmd.Env, strings.Join([]string{"CGO_ENABLED", "1"}, "="))
 	output, err := cmd.CombinedOutput()
 	if nil != err {
 		fmt.Println("Error: ", err)

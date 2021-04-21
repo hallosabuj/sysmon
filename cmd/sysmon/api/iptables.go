@@ -12,6 +12,7 @@ import (
 	"sysmon/proto/sysmonpb"
 )
 
+// Retruns array of table names
 func Tables() []string {
 	tables, err := ioutil.ReadFile("/etc/iproute2/rt_tables")
 	if err != nil {
@@ -75,6 +76,7 @@ func FindInArray(array []int, element int) bool {
 func AddTable(request *sysmonpb.IPRequest) string {
 	var interfaceName string = request.Request.InterfaceName
 	var ip string = strings.Split(request.Request.SourceIp, "/")[0]
+	//Create a number w.r.t. the ip
 	ipNumber, err := Ip2long(ip)
 	var response string
 	if err != nil {
@@ -94,6 +96,8 @@ func AddTable(request *sysmonpb.IPRequest) string {
 			break
 		}
 	}
+
+	// If table exist then add the rule and route directly
 	if tableExists {
 		response = "Table exist"
 		request.Request.TableName = interfaceName + "_" + ip

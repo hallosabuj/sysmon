@@ -42,6 +42,7 @@ message RuleRespone{
   Rules response   =1;
 }
 
+
 message Route{
   string index     =1;
   string route     =2;
@@ -117,6 +118,18 @@ message InterfaceDetails{
 message InterfaceDetailsResponse{
   InterfaceDetails response =1;
 }
+
+message AllocatedIP{
+  string ip =1;
+  string subnetMask =2;
+}
+message AllocatedIPs{
+  repeated AllocatedIP ips =1;
+}
+message AllocatedIPsResponse{
+  AllocatedIPs response =1;
+}
+
 
 service SysmonService {
   rpc Dong(DongReq) returns (DongRes) {
@@ -218,6 +231,12 @@ service SysmonService {
       post: "/api/v1/addtable"
       body: "request"
       response_body: "msg"
+    };
+  }
+  rpc ListAllocatedIp(IPRequest) returns (AllocatedIPsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/allocatedip"
+      response_body: "response"
     };
   }
 }
