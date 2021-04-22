@@ -34,6 +34,7 @@ type SysmonServiceClient interface {
 	IpTables(ctx context.Context, in *Request, opts ...grpc.CallOption) (*IPTablesResponse, error)
 	AddTable(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*Response, error)
 	ListAllocatedIp(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*AllocatedIPsResponse, error)
+	ListAllocatedIpGTP(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*AllocatedIPsResponse, error)
 }
 
 type sysmonServiceClient struct {
@@ -188,6 +189,15 @@ func (c *sysmonServiceClient) ListAllocatedIp(ctx context.Context, in *IPRequest
 	return out, nil
 }
 
+func (c *sysmonServiceClient) ListAllocatedIpGTP(ctx context.Context, in *IPRequest, opts ...grpc.CallOption) (*AllocatedIPsResponse, error) {
+	out := new(AllocatedIPsResponse)
+	err := c.cc.Invoke(ctx, "/sysmonpb.SysmonService/ListAllocatedIpGTP", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SysmonServiceServer is the server API for SysmonService service.
 // All implementations must embed UnimplementedSysmonServiceServer
 // for forward compatibility
@@ -208,6 +218,7 @@ type SysmonServiceServer interface {
 	IpTables(context.Context, *Request) (*IPTablesResponse, error)
 	AddTable(context.Context, *IPRequest) (*Response, error)
 	ListAllocatedIp(context.Context, *IPRequest) (*AllocatedIPsResponse, error)
+	ListAllocatedIpGTP(context.Context, *IPRequest) (*AllocatedIPsResponse, error)
 	mustEmbedUnimplementedSysmonServiceServer()
 }
 
@@ -262,6 +273,9 @@ func (UnimplementedSysmonServiceServer) AddTable(context.Context, *IPRequest) (*
 }
 func (UnimplementedSysmonServiceServer) ListAllocatedIp(context.Context, *IPRequest) (*AllocatedIPsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAllocatedIp not implemented")
+}
+func (UnimplementedSysmonServiceServer) ListAllocatedIpGTP(context.Context, *IPRequest) (*AllocatedIPsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAllocatedIpGTP not implemented")
 }
 func (UnimplementedSysmonServiceServer) mustEmbedUnimplementedSysmonServiceServer() {}
 
@@ -564,6 +578,24 @@ func _SysmonService_ListAllocatedIp_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SysmonService_ListAllocatedIpGTP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IPRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SysmonServiceServer).ListAllocatedIpGTP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sysmonpb.SysmonService/ListAllocatedIpGTP",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SysmonServiceServer).ListAllocatedIpGTP(ctx, req.(*IPRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SysmonService_ServiceDesc is the grpc.ServiceDesc for SysmonService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -634,6 +666,10 @@ var SysmonService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAllocatedIp",
 			Handler:    _SysmonService_ListAllocatedIp_Handler,
+		},
+		{
+			MethodName: "ListAllocatedIpGTP",
+			Handler:    _SysmonService_ListAllocatedIpGTP_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

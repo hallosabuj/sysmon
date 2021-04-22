@@ -239,4 +239,11 @@ service SysmonService {
       response_body: "response"
     };
   }
+
+  rpc ListAllocatedIpGTP(IPRequest) returns (AllocatedIPsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/allocatedip-gtp"
+      response_body: "response"
+    };
+  }
 }

@@ -19,10 +19,18 @@ type IpWithMask struct {
 
 var AllocatedIPs []IpWithMask
 
-var IPs map[string]string
+var IPs map[string]string = make(map[string]string)
 
-func DhcpSnooping() {
-	IPs = make(map[string]string)
+func Worker(ch chan IpWithMask) {
+	for {
+		select {
+		case data := <-ch:
+			IPs[data.IP] = data.SubnetMask
+		}
+	}
+}
+
+func DhcpSnooping(ch chan IpWithMask) {
 	// var (
 	// 	device  string = "enp0s8"
 	// 	snaplen int32  = 65535
@@ -32,13 +40,15 @@ func DhcpSnooping() {
 	// 	handle  *pcap.Handle
 	// )
 	// handle, err = pcap.OpenLive(device, snaplen, promisc, timeout)
-	///////////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//This portion need to be deleted and abobe portion needs to be uncommented
 	var (
 		err    error
 		handle *pcap.Handle
 	)
-	handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/temp.pcap")
-	///////////////////////////////////////////////////////////////
+	handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/dhcp.pcap")
+	//////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,52 +64,41 @@ func DhcpSnooping() {
 
 	for packet := range packetSource.Packets() {
 		if len(packet.Layers()) == 4 && packet.Layers()[3].LayerType() == 118 {
-			// fmt.Println(packet.String())
-			fmt.Println("Layer related ::::::::::::::::::::::")
 			dhcp_layer := packet.Layer(layers.LayerTypeDHCPv4)
 			dhcp_packet := dhcp_layer.(*layers.DHCPv4)
 
 			var subnetMask string
 			var destinationIP string
-			var srcIP string
+			// var srcIP string
 			var isAckMessage bool = false
 			for i := range dhcp_packet.Options {
 				if strings.Contains(dhcp_packet.Options[i].String(), "(MessageType:Ack)") {
-					fmt.Println("Acknowledgement")
+					// fmt.Println("Acknowledgement")
 					isAckMessage = true
 					ip_layer := packet.Layer(layers.LayerTypeIPv4)
 					ip_packet := ip_layer.(*layers.IPv4)
 					destinationIP = ip_packet.DstIP.String()
-					srcIP = ip_packet.SrcIP.String()
+					// srcIP = ip_packet.SrcIP.String()
 				}
 				if strings.Contains(dhcp_packet.Options[i].String(), "(SubnetMask:") {
 					subnetMask = strings.Replace(strings.Split(dhcp_packet.Options[i].String(), ":")[1], ")", "", 1)
 				}
 			}
 			if isAckMessage {
-				// allocatedIPs = append(allocatedIPs, IpWithMask{Index: "1", IP: destinationIP, SubnetMask: subnetMask})
-				IPs[destinationIP] = subnetMask
-				fmt.Println("Destination address (IP allocated) :", destinationIP)
-				fmt.Println("Subnet Mask :", subnetMask)
-				fmt.Println("Source IP :", srcIP)
+				ch <- IpWithMask{IP: destinationIP, SubnetMask: subnetMask}
 			}
-			// fmt.Println("DHCP code :", dhcp_packet.Options[0])
-			fmt.Println("Layer related ::::::::::::::::::::::")
-			AllocatedIPs = AllocatedIPs[:0]
-			for key, value := range IPs {
-				AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: key, SubnetMask: value})
-			}
-			fmt.Println(AllocatedIPs)
 		}
 	}
 }
 
-func gtpParsing() {
+func GtpSnooping(ch chan IpWithMask) {
+	//////////////////////////////////////////////////////////////////////////////////
 	var (
 		err    error
 		handle *pcap.Handle
 	)
-	handle, err = pcap.OpenOffline("/root/EPC_Capture_15-Apr-2021_20-47-54.pcap")
+	handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/gtp.pcap")
+	//////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -126,7 +125,10 @@ func gtpParsing() {
 						for j := 2; j < len(resp.PAA.Payload); j++ {
 							ip += "." + strconv.Itoa(int(resp.PAA.Payload[j]))
 						}
-						fmt.Println("UE IP :", ip)
+						// fmt.Println("UE IP :", ip)
+						ch <- IpWithMask{IP: ip}
+						// AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: ip})
+						// fmt.Println("Allocated IP:", AllocatedIPs)
 					}
 				}
 			}
@@ -140,5 +142,9 @@ func gtpParsing() {
 // }
 
 func GetAllocatedIP() []IpWithMask {
+	AllocatedIPs = AllocatedIPs[:0]
+	for key, value := range IPs {
+		AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: key, SubnetMask: value})
+	}
 	return AllocatedIPs
 }

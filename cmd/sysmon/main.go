@@ -17,14 +17,15 @@ func main() {
 	flag.Parse()
 
 	var (
-		signals = make(chan os.Signal, 1)
-		done    = make(chan bool, 1)
+		signals          = make(chan os.Signal, 1)
+		done             = make(chan bool, 1)
+		channelForPacket = make(chan api.IpWithMask)
 	)
 
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-
-	// go api.Test()
-	go api.DhcpSnooping()
+	go api.DhcpSnooping(channelForPacket)
+	go api.GtpSnooping(channelForPacket)
+	go api.Worker(channelForPacket)
 	go func() {
 		<-signals
 		done <- true
