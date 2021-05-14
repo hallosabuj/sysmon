@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -30,35 +31,35 @@ func Worker(ch chan IpWithMask) {
 	}
 }
 
-func DhcpSnooping(ch chan IpWithMask) {
-	// var (
-	// 	device  string = "enp0s8"
-	// 	snaplen int32  = 65535
-	// 	promisc bool   = false
-	// 	err     error
-	// 	timeout time.Duration = -1 * time.Second
-	// 	handle  *pcap.Handle
-	// )
-	// handle, err = pcap.OpenLive(device, snaplen, promisc, timeout)
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//This portion need to be deleted and abobe portion needs to be uncommented
+func DhcpSnooping(ch chan IpWithMask, interfaceName string) {
 	var (
-		err    error
-		handle *pcap.Handle
+		device  string = interfaceName
+		snaplen int32  = 1000000000
+		promisc bool   = false
+		err     error
+		timeout time.Duration = -1 * time.Second
+		handle  *pcap.Handle
 	)
-	handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/dhcp.pcap")
-	//////////////////////////////////////////////////////////////////////////////////
+	handle, err = pcap.OpenLive(device, snaplen, promisc, timeout)
+
+	// ////////////////////////////////////////////////////////////////////////////////
+	// // This portion need to be deleted and abobe portion needs to be uncommented
+	// var (
+	// 	err    error
+	// 	handle *pcap.Handle
+	// )
+	// handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/EPC_BB.pcap")
+	// ////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer handle.Close()
 
-	// var filter string = "src host 172.20.1.8 and icmp"
-	// err = handle.SetBPFFilter(filter)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	var filter string = "udp port 67"
+	err = handle.SetBPFFilter(filter)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
@@ -75,9 +76,10 @@ func DhcpSnooping(ch chan IpWithMask) {
 				if strings.Contains(dhcp_packet.Options[i].String(), "(MessageType:Ack)") {
 					// fmt.Println("Acknowledgement")
 					isAckMessage = true
-					ip_layer := packet.Layer(layers.LayerTypeIPv4)
-					ip_packet := ip_layer.(*layers.IPv4)
-					destinationIP = ip_packet.DstIP.String()
+					// ip_layer := packet.Layer(layers.LayerTypeIPv4)
+					// ip_packet := ip_layer.(*layers.IPv4)
+					// destinationIP = ip_packet.DstIP.String()
+					destinationIP = dhcp_packet.YourClientIP.String()
 					// srcIP = ip_packet.SrcIP.String()
 				}
 				if strings.Contains(dhcp_packet.Options[i].String(), "(SubnetMask:") {
@@ -92,17 +94,33 @@ func DhcpSnooping(ch chan IpWithMask) {
 }
 
 func GtpSnooping(ch chan IpWithMask) {
-	//////////////////////////////////////////////////////////////////////////////////
 	var (
-		err    error
-		handle *pcap.Handle
+		device  string = "lo"
+		snaplen int32  = 1000000000
+		promisc bool   = false
+		err     error
+		timeout time.Duration = -1 * time.Second
+		handle  *pcap.Handle
 	)
-	handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/gtp.pcap")
+	handle, err = pcap.OpenLive(device, snaplen, promisc, timeout)
+
+	//////////////////////////////////////////////////////////////////////////////////
+	// var (
+	// 	err    error
+	// 	handle *pcap.Handle
+	// )
+	// handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/gtp.pcap")
 	//////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer handle.Close()
+
+	var filter string = "udp port 2123"
+	err = handle.SetBPFFilter(filter)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
@@ -119,16 +137,18 @@ func GtpSnooping(ch chan IpWithMask) {
 					if err != nil {
 						fmt.Println(err)
 					} else {
-						// fmt.Println(resp.PAA)
-						var ip string
-						ip = strconv.Itoa(int(resp.PAA.Payload[1]))
-						for j := 2; j < len(resp.PAA.Payload); j++ {
-							ip += "." + strconv.Itoa(int(resp.PAA.Payload[j]))
+						if resp.PAA != nil {
+							// fmt.Println(resp.PAA)
+							var ip string
+							ip = strconv.Itoa(int(resp.PAA.Payload[1]))
+							for j := 2; j < len(resp.PAA.Payload); j++ {
+								ip += "." + strconv.Itoa(int(resp.PAA.Payload[j]))
+							}
+							// fmt.Println("UE IP :", ip)
+							ch <- IpWithMask{IP: ip}
+							// AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: ip})
+							// fmt.Println("Allocated IP:", AllocatedIPs)
 						}
-						// fmt.Println("UE IP :", ip)
-						ch <- IpWithMask{IP: ip}
-						// AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: ip})
-						// fmt.Println("Allocated IP:", AllocatedIPs)
 					}
 				}
 			}

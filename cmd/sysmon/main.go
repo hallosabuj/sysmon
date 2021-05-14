@@ -23,9 +23,12 @@ func main() {
 	)
 
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-	go api.DhcpSnooping(channelForPacket)
+	interfaces := api.Interfaces()
+	for i := 0; i < len(interfaces); i++ {
+		go api.DhcpSnooping(channelForPacket, interfaces[i].Name)
+		go api.Worker(channelForPacket)
+	}
 	go api.GtpSnooping(channelForPacket)
-	go api.Worker(channelForPacket)
 	go func() {
 		<-signals
 		done <- true
