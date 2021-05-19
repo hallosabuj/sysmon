@@ -34,24 +34,24 @@ func Worker(ch chan IpWithMask) {
 }
 
 func DhcpSnooping(ch chan IpWithMask, interfaceName string) {
-	var (
-		device  string = interfaceName
-		snaplen int32  = 1000000000
-		promisc bool   = false
-		err     error
-		timeout time.Duration = -1 * time.Second
-		handle  *pcap.Handle
-	)
-	handle, err = pcap.OpenLive(device, snaplen, promisc, timeout)
-
-	// ////////////////////////////////////////////////////////////////////////////////
-	// // This portion need to be deleted and abobe portion needs to be uncommented
 	// var (
-	// 	err    error
-	// 	handle *pcap.Handle
+	// 	device  string = interfaceName
+	// 	snaplen int32  = 1000000000
+	// 	promisc bool   = false
+	// 	err     error
+	// 	timeout time.Duration = -1 * time.Second
+	// 	handle  *pcap.Handle
 	// )
-	// handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/EPC_BB.pcap")
-	// ////////////////////////////////////////////////////////////////////////////////
+	// handle, err = pcap.OpenLive(device, snaplen, promisc, timeout)
+
+	////////////////////////////////////////////////////////////////////////////////
+	// This portion need to be deleted and abobe portion needs to be uncommented
+	var (
+		err    error
+		handle *pcap.Handle
+	)
+	handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/ens192.pcap")
+	////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
 		log.Println("Error here", err)
 		return
@@ -76,35 +76,36 @@ func DhcpSnooping(ch chan IpWithMask, interfaceName string) {
 
 			var subnetMask string
 			var destinationIP string
-			// var srcIP string
 			var isAckMessage bool = false
+			var dhcp_ipv4_address string = ""
 			for i := range dhcp_packet.Options {
 				if strings.Contains(dhcp_packet.Options[i].String(), "(MessageType:Ack)") {
 					// fmt.Println("Acknowledgement")
 					isAckMessage = true
-					// ip_layer := packet.Layer(layers.LayerTypeIPv4)
-					// ip_packet := ip_layer.(*layers.IPv4)
-					// destinationIP = ip_packet.DstIP.String()
 					destinationIP = dhcp_packet.YourClientIP.String()
 					// srcIP = ip_packet.SrcIP.String()
 				}
 				if strings.Contains(dhcp_packet.Options[i].String(), "(SubnetMask:") {
 					subnetMask = strings.Replace(strings.Split(dhcp_packet.Options[i].String(), ":")[1], ")", "", 1)
 				}
+				if strings.Contains(dhcp_packet.Options[i].String(), "ServerID") {
+					dhcp_ipv4_address = strings.Replace(strings.Split(dhcp_packet.Options[i].String(), ":")[1], ")", "", 1)
+				}
 			}
-
-			if isAckMessage {
+			// Make two SOAP calls to PGW to get { SGi interface name : ens192, Gateway of SGi interface : 10.250.0.1, PGW address : 10.250.0.152 }
+			// Instead of makig SOAP calls we are fetching from the XML file
+			SgiIpAddress, SgiInterfaceName := ParsePGWConfigXML()
+			if isAckMessage && SgiIpAddress == dhcp_packet.RelayAgentIP.String() && dhcp_ipv4_address == "10.250.0.20" {
 				fmt.Println("Packet ID :", i)
-				// DHCPv4 message type is an Acknowledgment type message
+				// If DHCPv4 message type is an Acknowledgment type message then this portion will execute
 				// Here destination assress is modified and Subnet Mask is added
 				dst := net.ParseIP(destinationIP)
 				mask := net.IPMask(net.ParseIP(subnetMask).To4())
 				prefixSize, _ := mask.Size()
 				finalDestination := dst.Mask(mask).String() + "/" + strconv.Itoa(prefixSize)
 				fmt.Println("FinalDestination :", finalDestination)
-				// Make two SOAP calls to PGW to get { SGi interface name : ens192, Gateway of SGi interface : 10.250.0.1, PGW address : 10.250.0.152 }
-				// Instead of makig SOAP calls we are fetching from the XML file
-				SgiIpAddress, SgiInterfaceName := ParsePGWConfigXML()
+				fmt.Println("Interface Name :", interfaceName)
+				fmt.Println("Server ID :", dhcp_ipv4_address)
 				fmt.Println("SgiIpAddress :", SgiIpAddress)
 				fmt.Println("SgiInterfaceName :", SgiInterfaceName)
 				request := *&sysmonpb.IPRequest{Request: &sysmonpb.Request{SourceIp: SgiIpAddress, Destination: finalDestination, Intermediate: SgiIpAddress, InterfaceName: SgiInterfaceName}}

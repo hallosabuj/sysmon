@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	// _ "github.com/mattn/go-sqlite3"
 )
 
 type PN_TPGWC_CONFIG struct {
@@ -18,9 +19,34 @@ type Node struct {
 	IntfSgi   string   `xml:"intfSgi"`
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// For this sqlite3 to be working we need some package
+// /lib64/libc.so.6: version `GLIBC_2.28' not found (required by ./routing.bin)
+////////////////////////////////////////////////////////////////////////////////
+
+// func GetDHCPv4ServerAddress() string {
+// 	// File for local testing
+// 	// database, _ := sql.Open("sqlite3", "/home/sabuj/spicasys/Redline/Routing_issue/test/epcpgwconfigdb")
+// 	// File for vm testing
+// 	database, _ := sql.Open("sqlite3", "/opt/rdl-flexcore/db/epcpgwconfigdb")
+// 	rows, _ := database.Query("select pdn_index,dhcp_ipv4_address from pgw_pdn_profile_table")
+// 	var dhcp_ipv4_address string
+// 	var pdn_index int
+// 	for rows.Next() {
+// 		rows.Scan(&pdn_index, &dhcp_ipv4_address)
+// 		if pdn_index == 1 {
+// 			break
+// 		}
+// 	}
+// 	return dhcp_ipv4_address
+// }
+
 func ParsePGWConfigXML() (SgiIpAddress string, SgiInterfaceName string) {
 	// Open our xmlFile
-	xmlFile, err := os.Open("/opt/rdl-flexcore/configs/EPCConfig_PGW.xml")
+	// File for vm testing
+	// xmlFile, err := os.Open("/opt/rdl-flexcore/configs/EPCConfig_PGW.xml")
+	// File for local testing
+	xmlFile, err := os.Open("/home/sabuj/spicasys/Redline/Routing_issue/EPCConfig_PGW.xml")
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
