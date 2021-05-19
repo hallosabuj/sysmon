@@ -284,7 +284,7 @@ func Build() {
 
 	cmd := exec.Command(
 		filepath.Join("go"),
-		strings.Split("build -o bin/sysmon.bin cmd/sysmon/main.go", " ")...,
+		strings.Split("build -o bin/routing.bin cmd/sysmon/main.go", " ")...,
 	)
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, strings.Join([]string{"GOARCH", "amd64"}, "="))

@@ -3,8 +3,10 @@ package api
 import (
 	"fmt"
 	"log"
+	"net"
 	"strconv"
 	"strings"
+	"sysmon/proto/sysmonpb"
 	"time"
 
 	"github.com/google/gopacket"
@@ -51,19 +53,23 @@ func DhcpSnooping(ch chan IpWithMask, interfaceName string) {
 	// handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/EPC_BB.pcap")
 	// ////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error here", err)
+		return
 	}
 	defer handle.Close()
 
 	var filter string = "udp port 67"
 	err = handle.SetBPFFilter(filter)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-
+	i := 0
 	for packet := range packetSource.Packets() {
+		fmt.Println("Packet ID :", i)
+		// DHCPv4 packet have 4 layers, and LayerType in DHCPv4 and integer representaion is 118
 		if len(packet.Layers()) == 4 && packet.Layers()[3].LayerType() == 118 {
 			dhcp_layer := packet.Layer(layers.LayerTypeDHCPv4)
 			dhcp_packet := dhcp_layer.(*layers.DHCPv4)
@@ -86,10 +92,29 @@ func DhcpSnooping(ch chan IpWithMask, interfaceName string) {
 					subnetMask = strings.Replace(strings.Split(dhcp_packet.Options[i].String(), ":")[1], ")", "", 1)
 				}
 			}
+
 			if isAckMessage {
+				fmt.Println("Packet ID :", i)
+				// DHCPv4 message type is an Acknowledgment type message
+				// Here destination assress is modified and Subnet Mask is added
+				dst := net.ParseIP(destinationIP)
+				mask := net.IPMask(net.ParseIP(subnetMask).To4())
+				prefixSize, _ := mask.Size()
+				finalDestination := dst.Mask(mask).String() + "/" + strconv.Itoa(prefixSize)
+				fmt.Println("FinalDestination :", finalDestination)
+				// Make two SOAP calls to PGW to get { SGi interface name : ens192, Gateway of SGi interface : 10.250.0.1, PGW address : 10.250.0.152 }
+				// Instead of makig SOAP calls we are fetching from the XML file
+				SgiIpAddress, SgiInterfaceName := ParsePGWConfigXML()
+				fmt.Println("SgiIpAddress :", SgiIpAddress)
+				fmt.Println("SgiInterfaceName :", SgiInterfaceName)
+				request := *&sysmonpb.IPRequest{Request: &sysmonpb.Request{SourceIp: SgiIpAddress, Destination: finalDestination, Intermediate: SgiIpAddress, InterfaceName: SgiInterfaceName}}
+				// Call AddTable() here
+				AddTable(&request)
+				isAckMessage = false
 				ch <- IpWithMask{IP: destinationIP, SubnetMask: subnetMask}
 			}
 		}
+		i++
 	}
 }
 
@@ -112,14 +137,16 @@ func GtpSnooping(ch chan IpWithMask) {
 	// handle, err = pcap.OpenOffline("/home/sabuj/spicasys/sabuj/sysmon/bin/gtp.pcap")
 	//////////////////////////////////////////////////////////////////////////////////
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	defer handle.Close()
 
 	var filter string = "udp port 2123"
 	err = handle.SetBPFFilter(filter)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
@@ -155,11 +182,6 @@ func GtpSnooping(ch chan IpWithMask) {
 		}
 	}
 }
-
-// func Test() {
-// 	AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: "120.120.120.120", SubnetMask: "255.255.255.0"})
-// 	AllocatedIPs = append(AllocatedIPs, IpWithMask{IP: "220.220.220.220", SubnetMask: "255.255.255.0"})
-// }
 
 func GetAllocatedIP() []IpWithMask {
 	AllocatedIPs = AllocatedIPs[:0]

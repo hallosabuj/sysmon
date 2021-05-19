@@ -24,7 +24,7 @@ func AddIPRoute(request *sysmonpb.IPRequest) string {
 	routes, _ := exec.Command("ip", "route", "list", "table", table_name).Output()
 
 	for _, line := range strings.Split(strings.TrimSuffix(string(routes), "\n"), "\n") {
-		if strings.Contains(line, destination) {
+		if strings.Contains(line, destination) && strings.Contains(line, intermediate) && strings.Contains(line, net_interface) && strings.Contains(line, table_name) {
 			response = "Route exist.."
 			flag = true
 			break

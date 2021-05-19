@@ -23,12 +23,15 @@ func main() {
 	)
 
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	// Here we are fetching all the interface name are running DHCP snooping on each interface
 	interfaces := api.Interfaces()
 	for i := 0; i < len(interfaces); i++ {
 		go api.DhcpSnooping(channelForPacket, interfaces[i].Name)
 		go api.Worker(channelForPacket)
 	}
-	go api.GtpSnooping(channelForPacket)
+	// This portion need to be uncommented for GTP snooping working
+	// go api.GtpSnooping(channelForPacket)
 	go func() {
 		<-signals
 		done <- true
