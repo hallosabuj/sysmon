@@ -30,6 +30,7 @@ type NetInterfaceDetails struct {
 	MulticastAddress []IpAddr  `json:"multicastAddress"`
 }
 
+// Returns all the allocated IP in the machine
 func InterfaceAddresses() []IpAddr {
 	addr, _ := net.InterfaceAddrs()
 	var result []IpAddr
@@ -40,6 +41,8 @@ func InterfaceAddresses() []IpAddr {
 	return result
 }
 
+// Check an IP whether it IPv4 or IPv6
+// For invalid IP returns nil
 func CheckV4orV6(ip string) string {
 	ip = strings.Split(ip, "/")[0]
 	parsedIP := net.ParseIP(ip)
@@ -54,6 +57,7 @@ func CheckV4orV6(ip string) string {
 	return "nil"
 }
 
+// Returns interface details for a given interface name
 func InterfaceDetailsByName(request *sysmonpb.Request) NetInterfaceDetails {
 	interface_name := request.InterfaceName
 	interfaceObj, _ := net.InterfaceByName(interface_name)
@@ -95,6 +99,7 @@ func InterfaceDetailsByName(request *sysmonpb.Request) NetInterfaceDetails {
 	return result
 }
 
+// Returns name of all the available interfaces in the machine
 func Interfaces() []Interface {
 	interfaces, _ := net.Interfaces()
 	var result []Interface

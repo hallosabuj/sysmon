@@ -88,6 +88,7 @@ type Routes struct {
 	TableName string
 }
 
+// This function provides all the routes present in the machine
 func IPRoutes() []Routes {
 	tables := Tables()
 	var result []Routes
@@ -103,6 +104,7 @@ func IPRoutes() []Routes {
 	return result
 }
 
+// This function provides all the routes for a given routing table name
 func IPRoutesByTableName(request *sysmonpb.Request) []Routes {
 	rules, _ := exec.Command("ip", "route", "list", "table", request.TableName).Output()
 	var result []Routes

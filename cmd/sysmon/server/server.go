@@ -3,14 +3,22 @@ package server
 import (
 	"context"
 	"fmt"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
-	"io/fs"
+
+	///////////////////////////////////////////
+	// This portion is for UI
+	// "io/fs"
+	///////////////////////////////////////////
 	"net"
 	"net/http"
 	"strings"
 	"sysmon/proto/sysmonpb"
-	build "sysmon/web"
+	///////////////////////////////////////////
+	// This portion is for UI
+	// build "sysmon/web"
+	///////////////////////////////////////////
 )
 
 func GRPCStart() (int, error) {
@@ -42,13 +50,19 @@ func RESTStart(conn *grpc.ClientConn, port int) (int, error) {
 		return 0, err
 	}
 
-	filesystem := fs.FS(build.WWW)
-	child, err := fs.Sub(filesystem, "build")
+	///////////////////////////////////////////
+	// This portion is for UI
+	// filesystem := fs.FS(build.WWW)
+	// child, err := fs.Sub(filesystem, "build")
+	///////////////////////////////////////////
 	if nil != err {
 		return 0, err
 	}
 	var (
-		web      = http.FileServer(http.FS(child))
+		///////////////////////////////////////////
+		// This portion is for UI
+		// web      = http.FileServer(http.FS(child))
+		///////////////////////////////////////////
 		handlers = http.NewServeMux()
 	)
 	handlers.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
@@ -56,11 +70,14 @@ func RESTStart(conn *grpc.ClientConn, port int) (int, error) {
 			mux.ServeHTTP(writer, request)
 			return
 		}
-		if strings.HasPrefix(request.URL.Path, "/web") {
-			http.Redirect(writer, request, "/", http.StatusFound)
-			return
-		}
-		web.ServeHTTP(writer, request)
+		///////////////////////////////////////////
+		// This portion is for UI
+		// if strings.HasPrefix(request.URL.Path, "/web") {
+		// 	http.Redirect(writer, request, "/", http.StatusFound)
+		// 	return
+		// }
+		// web.ServeHTTP(writer, request)
+		///////////////////////////////////////////
 	})
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if nil != err {

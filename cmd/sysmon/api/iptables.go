@@ -12,7 +12,7 @@ import (
 	"sysmon/proto/sysmonpb"
 )
 
-// Retruns array of table names
+// Retruns array of table names present in the machine
 func Tables() []string {
 	tables, err := ioutil.ReadFile("/etc/iproute2/rt_tables")
 	if err != nil {
@@ -27,6 +27,7 @@ func Tables() []string {
 	return result
 }
 
+// Generate an unique interger for an IP
 func Ip2long(ipAddr string) (uint32, error) {
 	ip := net.ParseIP(ipAddr)
 	if ip == nil {
@@ -36,6 +37,7 @@ func Ip2long(ipAddr string) (uint32, error) {
 	return binary.BigEndian.Uint32(ip), nil
 }
 
+// Generate an unique IP from an integer
 func Long2ip(ipLong uint32) string {
 	ipByte := make([]byte, 4)
 	binary.BigEndian.PutUint32(ipByte, ipLong)
@@ -43,6 +45,7 @@ func Long2ip(ipLong uint32) string {
 	return ip.String()
 }
 
+// Convert an integer to string
 func int32ToString(n uint32) string {
 	buf := [11]byte{}
 	pos := len(buf)
@@ -64,6 +67,9 @@ func int32ToString(n uint32) string {
 	}
 }
 
+// Takes an integer array and an integer
+// Integer present in the array 		=> return true
+// Integer not present in the array 	=> return false
 func FindInArray(array []int, element int) bool {
 	for i := range array {
 		if array[i] == element {
@@ -105,9 +111,11 @@ func AddTable(request *sysmonpb.IPRequest) string {
 		response = response + "\n" + strings.TrimSuffix(AddIPRoute(request), "\n")
 		return response
 	} else {
+		// Generating a new number for the new table
+		// New number would be the next non-existant number starting from 200
 		newTableNumber := 200
 		newTableName := interfaceName + "_" + ip
-		for true {
+		for {
 			if FindInArray(tableNumber, newTableNumber) {
 				newTableNumber = newTableNumber + 1
 			} else {
@@ -115,7 +123,7 @@ func AddTable(request *sysmonpb.IPRequest) string {
 			}
 		}
 		lineToAdd := strconv.Itoa(newTableNumber) + "\t" + newTableName + "\n"
-		//Now write to rt_tables
+		//Now write the table number and name to rt_tables
 		file, err := os.OpenFile("/etc/iproute2/rt_tables", os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
 			// fmt.Println(err)
@@ -129,6 +137,7 @@ func AddTable(request *sysmonpb.IPRequest) string {
 			return response
 		}
 		response = "Table added..."
+		// After adding table we need to add rule and route
 		request.Request.TableName = newTableName
 		response = response + "\n" + AddIPRule(request)
 		response = response + "\n" + strings.TrimSuffix(AddIPRoute(request), "\n")

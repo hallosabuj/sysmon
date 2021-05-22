@@ -277,10 +277,10 @@ func BuildWeb() error {
 }
 
 func Build() {
-	if err := BuildWeb(); nil != err {
-		fmt.Println("Error: ", err)
-		return
-	}
+	// if err := BuildWeb(); nil != err {
+	// 	fmt.Println("Error: ", err)
+	// 	return
+	// }
 
 	cmd := exec.Command(
 		filepath.Join("go"),

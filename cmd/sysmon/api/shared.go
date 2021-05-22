@@ -37,3 +37,23 @@ func MakeSudo() {
 		fmt.Println(stderr)
 	}
 }
+
+// This function will check whether all nodes are running of not
+func CheckForNodes() bool {
+	// pass
+	return true
+}
+
+// Start DHCP snooping and add other routes inside this function
+func StartRoutigAgent() {
+	channelForPacket := make(chan IpWithMask)
+	// Here we are fetching all the interface name are running DHCP snooping on each interface
+	_, SGiInterface := ParsePGWConfigXML()
+	go DhcpSnooping(channelForPacket, SGiInterface)
+	go Worker(channelForPacket)
+	// This portion need to be uncommented for GTP snooping working
+	// go api.GtpSnooping(channelForPacket)
+
+	///////////////////////////////////////////////////////////////////////////////
+	// Now we need to go for adding rules and routes for other interfaces also
+}
