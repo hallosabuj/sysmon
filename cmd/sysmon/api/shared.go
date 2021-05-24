@@ -45,6 +45,8 @@ func MakeSudo() {
 func CheckForNodes() bool {
 	// pass
 	var running bool = true
+	status, _ := exec.Command("/bin/flexcorecli", "-c", "\"pgw get status\"").Output()
+	fmt.Println(string(status))
 	return !running
 }
 
@@ -73,8 +75,8 @@ func StartRoutigAgent() {
 				if strings.Compare(interfaceDetails.NormalAddress[j].Type, "V4") == 0 {
 					ipWithMask := interfaceDetails.NormalAddress[j].IP
 					// fmt.Println(ipWithMask, ":", interfaces[i].Name)
-					request := *&sysmonpb.IPRequest{Request: &sysmonpb.Request{SourceIp: ipWithMask, Destination: "default", Intermediate: strings.Split(ipWithMask, "/")[0], InterfaceName: interfaces[i].Name}}
-					AddTable(&request)
+					// request := *&sysmonpb.IPRequest{Request: &sysmonpb.Request{SourceIp: ipWithMask, Destination: "default", Intermediate: strings.Split(ipWithMask, "/")[0], InterfaceName: interfaces[i].Name}}
+					// AddTable(&request)
 					fmt.Println(ipWithMask, "default", strings.Split(ipWithMask, "/")[0], interfaces[i].Name)
 					break
 				}
