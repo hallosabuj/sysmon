@@ -44,7 +44,7 @@ func MakeSudo() {
 // This function will check whether all nodes are running of not
 func CheckForNodes() bool {
 	// pass
-	var running bool = false
+	var running bool = true
 	return !running
 }
 
