@@ -90,12 +90,13 @@ func InterfaceDetailsByName(request *sysmonpb.Request) NetInterfaceDetails {
 	}
 
 	var gatewayList []Gateway
-	for _, line := range strings.Split(strings.TrimSuffix(string(output), "\n"), "\n") {
-		temp := Gateway{Destination: strings.Split(line, " ")[0], Gateway: strings.Split(line, " ")[1]}
-		gatewayList = append(gatewayList, temp)
+	if len(output) > 0 {
+		for _, line := range strings.Split(strings.TrimSuffix(string(output), "\n"), "\n") {
+			temp := Gateway{Destination: strings.Split(line, " ")[0], Gateway: strings.Split(line, " ")[1]}
+			gatewayList = append(gatewayList, temp)
+		}
 	}
 	result.Gateway = gatewayList
-
 	return result
 }
 

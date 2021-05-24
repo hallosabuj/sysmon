@@ -1,11 +1,12 @@
 package api
 
 import (
-	"encoding/xml"
 	"database/sql"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"os"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 

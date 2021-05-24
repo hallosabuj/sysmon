@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/google/gopacket v1.1.19
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.3.0
+	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/wmnsk/go-gtp v0.7.21
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210420210106-798c2154c571 // indirect
