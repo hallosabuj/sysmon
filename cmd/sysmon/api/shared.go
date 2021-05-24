@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strings"
 	"sysmon/proto/sysmonpb"
+	"time"
 )
 
 type Response struct {
@@ -43,11 +44,15 @@ func MakeSudo() {
 // This function will check whether all nodes are running of not
 func CheckForNodes() bool {
 	// pass
-	return true
+	var running bool = false
+	return !running
 }
 
 // Start DHCP snooping and add other routes inside this function
 func StartRoutigAgent() {
+	for CheckForNodes() {
+		time.Sleep(10)
+	}
 	channelForPacket := make(chan IpWithMask)
 	// Here we are fetching SGi interface name are running DHCP snooping that interface
 	_, SGiInterface := ParsePGWConfigXML()
@@ -61,15 +66,18 @@ func StartRoutigAgent() {
 	interfaces := Interfaces()
 	for i, _ := range interfaces {
 		request := sysmonpb.Request{InterfaceName: interfaces[i].Name}
-		interfaceDetails := InterfaceDetailsByName(&request)
-		for j, _ := range interfaceDetails.NormalAddress {
-			if strings.Compare(interfaceDetails.NormalAddress[j].Type, "V4") == 0 {
-				ipWithMask := interfaceDetails.NormalAddress[j].IP
-				// fmt.Println(ipWithMask, ":", interfaces[i].Name)
-				request := *&sysmonpb.IPRequest{Request: &sysmonpb.Request{SourceIp: ipWithMask, Destination: "default", Intermediate: strings.Split(ipWithMask, "/")[0], InterfaceName: interfaces[i].Name}}
-				AddTable(&request)
-				fmt.Println(ipWithMask, "default", strings.Split(ipWithMask, "/")[0], interfaces[i].Name)
-				break
+		//Do the same for interfaces except lo and virbr
+		if !(strings.Contains(interfaces[i].Name, "lo") || strings.Contains(interfaces[i].Name, "virbr")) {
+			interfaceDetails := InterfaceDetailsByName(&request)
+			for j, _ := range interfaceDetails.NormalAddress {
+				if strings.Compare(interfaceDetails.NormalAddress[j].Type, "V4") == 0 {
+					ipWithMask := interfaceDetails.NormalAddress[j].IP
+					// fmt.Println(ipWithMask, ":", interfaces[i].Name)
+					request := *&sysmonpb.IPRequest{Request: &sysmonpb.Request{SourceIp: ipWithMask, Destination: "default", Intermediate: strings.Split(ipWithMask, "/")[0], InterfaceName: interfaces[i].Name}}
+					AddTable(&request)
+					fmt.Println(ipWithMask, "default", strings.Split(ipWithMask, "/")[0], interfaces[i].Name)
+					break
+				}
 			}
 		}
 	}
