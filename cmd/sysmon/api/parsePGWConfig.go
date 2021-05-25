@@ -21,21 +21,35 @@ type Node struct {
 	IntfSgi   string   `xml:"intfSgi"`
 }
 
-func GetDHCPv4ServerAddress() string {
+type DHCPServerDetails struct {
+	dhcp_ipv4_address             string
+	pdn_index                     int
+	dhcp_ipv4_address_range_start string
+	dhcp_ipv4_address_range_end   string
+	ipv4_rule_netmask             string
+}
+
+func GetDHCPv4ServerDetails() DHCPServerDetails {
 	// File for local testing
 	// database, _ := sql.Open("sqlite3", "/home/sabuj/spicasys/Redline/Routing_issue/test/epcpgwconfigdb")
 	// File for vm testing
 	database, _ := sql.Open("sqlite3", "/opt/rdl-flexcore/db/epcpgwconfigdb")
-	rows, _ := database.Query("select pdn_index,dhcp_ipv4_address from pgw_pdn_profile_table")
-	var dhcp_ipv4_address string
-	var pdn_index int
+	rows, _ := database.Query("select pdn_index,dhcp_ipv4_address,dhcp_ipv4_address_range_start,dhcp_ipv4_address_range_end,ipv4_rule_netmask from pgw_pdn_profile_table")
+
+	var dhcpServer DHCPServerDetails
 	for rows.Next() {
-		rows.Scan(&pdn_index, &dhcp_ipv4_address)
-		if pdn_index == 1 {
+		rows.Scan(
+			&dhcpServer.pdn_index,
+			&dhcpServer.dhcp_ipv4_address,
+			&dhcpServer.dhcp_ipv4_address_range_start,
+			&dhcpServer.dhcp_ipv4_address_range_end,
+			&dhcpServer.ipv4_rule_netmask)
+
+		if dhcpServer.pdn_index == 1 {
 			break
 		}
 	}
-	return dhcp_ipv4_address
+	return dhcpServer
 }
 
 func ParsePGWConfigXML() (SgiIpAddress string, SgiInterfaceName string) {

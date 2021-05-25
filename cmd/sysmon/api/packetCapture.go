@@ -99,7 +99,7 @@ func DhcpSnooping(ch chan IpWithMask, interfaceName string) {
 			//    Which signify that the packet is destined for this SGi only
 			// 3. DHCP server address in DHCP packet is same as mentioned in the database
 			//    Which signify that the DHCP packet coming fro the correct DHCP server
-			if isAckMessage && SgiIpAddress == dhcp_packet.RelayAgentIP.String() && dhcp_ipv4_address == GetDHCPv4ServerAddress() {
+			if isAckMessage && SgiIpAddress == dhcp_packet.RelayAgentIP.String() && dhcp_ipv4_address == GetDHCPv4ServerDetails().dhcp_ipv4_address {
 
 				// Here destination assress is modified and Subnet Mask is added and finalDestination IP is generated
 				dst := net.ParseIP(destinationIP)
