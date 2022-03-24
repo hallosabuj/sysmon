@@ -2,10 +2,14 @@ package api
 
 import (
 	"bytes"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"math"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -43,20 +47,108 @@ func MakeSudo() {
 	}
 }
 
-// This function will check whether nodes are running of not
-func CheckForNodes(nodeType string) bool {
-	status, err := exec.Command("sh", "-c", "/usr/bin/flexcorecli -c \""+nodeType+" get status\"").CombinedOutput()
-	if err != nil {
-		// Node is not running
-		return false
+// This portion of code will be used for checking PGW status
+
+type UsernameToken struct {
+	Username  string
+	CreatedAt string
+	Nonce     string
+	Password  string
+}
+
+func makeTwoDigitRepresentation(num int) string {
+	if num < 0 {
+		num = -num
+	}
+	if num < 10 {
+		return fmt.Sprintf("0%v", num)
 	} else {
-		if strings.Contains(string(status), "Active") {
-			// Node is running
+		return fmt.Sprintf("%v", num)
+	}
+}
+func GenerateUsernameToken() (usernameToken UsernameToken) {
+	createdAt := ""
+	presentTime := time.Now()
+	_, offset := presentTime.Zone()
+	if (offset/60)/60 > 0 {
+		createdAt = fmt.Sprintf("%v-%v-%vT%v:%v:%v+%v:%v", presentTime.Year(), int(presentTime.Month()), presentTime.Day(), presentTime.Hour(), presentTime.Minute(), presentTime.Second(), makeTwoDigitRepresentation((offset/60)/60), makeTwoDigitRepresentation((offset/60)%60))
+	} else {
+		createdAt = fmt.Sprintf("%v-%v-%vT%v:%v:%v-%v:%v", presentTime.Year(), int(presentTime.Month()), presentTime.Day(), presentTime.Hour(), presentTime.Minute(), presentTime.Second(), makeTwoDigitRepresentation((offset/60)/60), makeTwoDigitRepresentation((offset/60)%60))
+	}
+	simple_nonce := 620452692
+	encoded_nonce := base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(simple_nonce)))
+	h := sha1.New()
+	inputForSHA1 := strconv.Itoa(simple_nonce) + createdAt + "rdl"
+	h.Write([]byte(inputForSHA1))
+	bs := h.Sum(nil)
+
+	usernameToken.CreatedAt = createdAt
+	usernameToken.Nonce = encoded_nonce
+	usernameToken.Username = "Redline"
+	usernameToken.Password = base64.StdEncoding.EncodeToString(bs)
+
+	return usernameToken
+}
+
+func GetPgwPort() string {
+	PGW_MANAGEMENT_PORT := ""
+	// environmentVariables, err := exec.Command("cat", "env.txt").Output()
+	environmentVariables, err := exec.Command("systemctl", "show-environment").Output()
+	if err != nil {
+		fmt.Println("Error occured :", err)
+	}
+
+	for _, line := range strings.Split(strings.TrimSuffix(string(environmentVariables), "\n"), "\n") {
+		if strings.Contains(line, "PGW_MANAGEMENT_PORT") {
+			PGW_MANAGEMENT_PORT = strings.Split(line, "=")[1]
+		}
+	}
+	return PGW_MANAGEMENT_PORT
+}
+
+func soapCall(usernameToken UsernameToken, PGW_MANAGEMENT_PORT string) string {
+	username := usernameToken.Username
+	password := usernameToken.Password
+	nonce := usernameToken.Nonce
+	createdAt := usernameToken.CreatedAt
+	xmlbody := `<?xml version="1.0" encoding="UTF-8"?>
+				<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://tempuri.org/EPC-PGW.xsd" xmlns:ns2="http://tempuri.org/wsse.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+				<SOAP-ENV:Header><wsse:Security xmlns:wsse="http://tempuri.org/wsse.xsd">
+				<wsse:UsernameToken>
+					<wsse:Username>` + username + `</wsse:Username>
+					<wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">` + password + `</wsse:Password>
+					<wsse:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">` + nonce + `</wsse:Nonce>
+					<wsu:Created xmlns:wsu="http://tempuri.org/wsu.xsd">` + createdAt + `</wsu:Created>
+				</wsse:UsernameToken>
+				</wsse:Security>
+				</SOAP-ENV:Header>
+				<SOAP-ENV:Body>
+					<ns1:GetNetEPCStatus/>
+				</SOAP-ENV:Body>
+				</SOAP-ENV:Envelope>`
+
+	resp, err := http.Post("http://127.0.0.1:"+PGW_MANAGEMENT_PORT, "text/xml", strings.NewReader(xmlbody))
+	if err != nil {
+		log.Fatal(err)
+	}
+	body, err := io.ReadAll(resp.Body) // byte body
+	return string(body)
+}
+
+// This function will check whether PWG are running of not
+func GetPgwStatus() bool {
+	usernameToken := GenerateUsernameToken()
+	stringValueBody := soapCall(usernameToken, GetPgwPort())
+	if len(strings.Split(stringValueBody, "<item>")) > 1 {
+		status := strings.Split(strings.Split(strings.Split(stringValueBody, "<item>")[1], "</itemp>")[0], "|")[0]
+		if status == "Active" {
 			return true
 		} else {
-			// Node is not running
 			return false
 		}
+
+	} else {
+		return false
 	}
 }
 
@@ -70,7 +162,7 @@ func SetRightNbits(n int) uint32 {
 
 // Start DHCP snooping and add other routes inside this function
 func StartRoutigAgent() {
-	for !CheckForNodes("pgw") {
+	for !GetPgwStatus() {
 		time.Sleep(1000000000 * 1)
 	}
 	///////////////////////////////////////
@@ -132,3 +224,20 @@ func StartRoutigAgent() {
 		}
 	}
 }
+
+// // This function will check whether nodes are running of not
+// func CheckForNodes(nodeType string) bool {
+// 	status, err := exec.Command("sh", "-c", "/usr/bin/flexcorecli -c \""+nodeType+" get status\"").CombinedOutput()
+// 	if err != nil {
+// 		// Node is not running
+// 		return false
+// 	} else {
+// 		if strings.Contains(string(status), "Active") {
+// 			// Node is running
+// 			return true
+// 		} else {
+// 			// Node is not running
+// 			return false
+// 		}
+// 	}
+// }
